@@ -1,0 +1,29 @@
+{
+    "name": "kbase-ui-plugin-catalog",
+    "description": "SDK Catalog Tool",
+    "author": [
+        "kbase"
+    ],
+    "keywords": [
+        "kbase",
+        "ui",
+        "plugin"
+    ],
+    "moduleType": "kbase-ui-plugin",
+    "main": "src/plugin/config.yml",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/kbase/kbase-ui-plugin-catalog"
+    },
+    "dependencies": {
+        "bluebird": "^3.0.0",
+        "bootstrap": "^3.3.0",
+        "kbase-common-js": "^2.5.0"
+    },
+    "devDependencies": {
+    },
+    "ignore": [
+        ".gitignore"
+    ],
+    "license": "SEE LICENSE IN LICENSE"
+}
