@@ -15,10 +15,10 @@ define([
     $,
     Promise,
     NarrativeMethodStore,
-    Catalog, 
-    NarrativeJobService, 
-    CatalogUtil, 
-    DynamicTable, 
+    Catalog,
+    NarrativeJobService,
+    CatalogUtil,
+    DynamicTable,
     DynamicService
 ) {
 
@@ -265,10 +265,7 @@ define([
                                         $container.removeClass('kbcb-active-filter');
                                     }
 
-                                    var rows = makeRecentRunsTableRows();
-                                    $adminRecentRunsTable.currentPage = 0;
-                                    $adminRecentRunsTable.options.updateFunction = self.createDynamicUpdateFunction(adminRecentRunsConfig, rows);
-                                    $adminRecentRunsTable.getNewData();
+                                    getLatestRunsInCustomRange(self.thenDate, self.nowDate);
                                 })
                         );
 
@@ -405,11 +402,10 @@ define([
                 var userRecentRunsConfig = {
                     rowsPerPage: 100,
                     headers: [
+                        { text : 'Narrative', id : 'narrative_name', isSortable : true },
                         { text: 'App ID', id: 'app_id', isSortable: true },
-                        { text: 'Module', id: 'app_module_name', isSortable: true },
                         { text: 'Submission Time', id: 'creation_time', isSortable: true },
-                        { text: 'Start Time', id: 'exec_start_time', isSortable: true },
-                        { text: 'End Time', id: 'finish_time', isSortable: true },
+                        { text: 'Queue Time', id: 'queue_time', isSortable: true },
                         { text: 'Run Time', id: 'run_time', isSortable: true },
                         { text: 'Status', id: 'result', isSortable: true },
                     ],
@@ -434,11 +430,10 @@ define([
 
                             if (self.options.useUserRecentRuns) {
                                 self.reformatDateInTD($row.children().eq(2));
-                                self.reformatDateInTD($row.children().eq(3));
-                                self.reformatDateInTD($row.children().eq(4));
-                                self.reformatIntervalInTD($row.children().eq(5));
+                                self.reformatIntervalInTD($row.children().eq(3));
+                                self.reformatIntervalInTD($row.children().eq(4));
 
-                                $jobLogButton = $row.children().eq(6).find('button');
+                                $jobLogButton = $row.children().eq(5).find('button');
                             }
                             else {
                                 self.reformatDateInTD($row.children().eq(4));
@@ -454,7 +449,7 @@ define([
                                    Note that it cheats out the ass - it'll manually append a new row to the table, which is outside
                                    of the purview of dynamicTable. That means that if you sort the table or change the parameters that
                                    the job info row will disappear. This is by design.
-                
+
                                    If you click on the button and already have a job-log row next, it'll remove it instead.
                                 */
                             $jobLogButton.on('click', function (e) {
@@ -602,6 +597,10 @@ define([
             this.njs.get_job_logs({ job_id: jobId, skip_lines: 0 })
                 .then(function (logs) {
                     $log.empty();
+                    $log.append(
+                      $('<div>')
+                        .append('Log for job id <b>' + jobId + '</b><hr>')
+                    );
                     for (var i = 0; i < logs.lines.length; i++) {
                         $log.append(logLine(i, logs.lines[i].line, logs.lines[i].is_error));
                     }
@@ -840,8 +839,16 @@ define([
                     }
 
                     if (job.finish_time) {
-                        job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
+                      job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
+
+                    if (job.narrative_name) {
+                      job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
+                    }
+
+                    job.queue_time = job.exec_start_time
+                      ? job.exec_start_time - job.creation_time
+                      : 0;
 
                     self.adminRecentRuns.push(job);
 
