@@ -295,8 +295,24 @@ define([
 
         addUserControls: function () {
             var self = this;
+
+            var $verR = $('<a href="#catalog/apps/release">').append('Released Apps');
+            var $verB = $('<a href="#catalog/apps/beta">').append('Beta Apps');
+
+            var $version = $('<li>').addClass('dropdown')
+                .append('<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Version<span class="caret"></span></a>');
+
+            $version
+                .append($('<ul>').addClass('dropdown-menu')
+                    .append($('<li>')
+                        .append($verR))
+                    .append($('<li>')
+                        .append($verB)));
+
             var $helpLink = $('<li>').append($('<a href="https://kbase.us/apps">').append('<i class="fa fa-question-circle"></i> Help'));
-            self.$ctrList.append($helpLink);
+            self.$ctrList
+              .append($version)
+              .append($helpLink);
         },
 
         addDeveloperControls: function () {
