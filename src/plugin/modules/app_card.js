@@ -1,10 +1,8 @@
 define([
-    'bluebird',
-    'jquery',
-    'kb_common/dom',
-    'kb_common/html',
-    'kb_widget/widgetSet'
-], function(Promise, $, DOM, html, WidgetSet) {
+    'jquery'
+], function(
+    $
+) {
     'use strict';
 
     // favorites callback should accept:
@@ -21,7 +19,6 @@ define([
     //    app:  { .. }  // app info returned (for now) from NMS
     //    module: { .. }  // module info returned for SDK methods
     //    favoritesCallback: function () // function called when favorites button is clicked
-    //    favoritesCallbackParams: {} // parameters passed on to the callback function
     //    isLoggedIn: true | false
     //    showReleaseTagLabels: true | false
     //    linkTag: dev | beta | release | commit_hash
@@ -50,7 +47,6 @@ define([
         this.cardsAdded = 0;
 
         this.favoritesCallback = params.favoritesCallback;
-        this.favoritesCallbackParams = params.favoritesCallbackParams;
 
         // only an SDK module if it has a module name
         this.isSdk = false;
@@ -120,10 +116,10 @@ define([
 
         this.isStarOn = function() {
             return this.onStar;
-        }
+        };
         this.getStarTime = function() {
             return this.onStarTime;
-        }
+        };
 
         this.deactivateStar = function() {
             this.deactivatedStar = true;
@@ -133,8 +129,10 @@ define([
             }
         };
 
-        this.getStarCount = function(count) {
-            if (this.starCount) return this.starCount;
+        this.getStarCount = function() {
+            if (this.starCount) {
+                return this.starCount;
+            }
             return 0;
         };
 
@@ -146,7 +144,7 @@ define([
                     this.$divs[k].find('.kbcb-star-count').html(count);
                 }
             } else {
-                for (var k = 0; k < this.$divs.length; k++) {
+                for (k = 0; k < this.$divs.length; k++) {
                     this.$divs[k].find('.kbcb-star-count').empty();
                 }
             }
@@ -166,14 +164,14 @@ define([
                             placement: 'bottom',
                             container: 'body',
                             delay: { show: 400, hide: 40 }
-                        });;
+                        });
                 }
             }
         };
         this.getRunCount = function() {
             if (this.runCount) return this.runCount;
             return 0;
-        }
+        };
 
 
         /* rendering methods that are shared in multiple places */
@@ -195,7 +193,7 @@ define([
             var $logoSpan = $('<div>').addClass('col-xs-3 kbcb-app-card-logo');
 
             if (!legacy) {
-                $logoSpan.append('<div class="fa-stack fa-3x"><i class="fa fa-square fa-stack-2x method-icon"></i><i class="fa fa-inverse fa-stack-1x fa-cube"></i></div>')
+                $logoSpan.append('<div class="fa-stack fa-3x"><i class="fa fa-square fa-stack-2x method-icon"></i><i class="fa fa-inverse fa-stack-1x fa-cube"></i></div>');
             } else {
                 $logoSpan.append('<span class="fa-stack fa-3x"><span class="fa fa-square fa-stack-2x app-icon"></span><span class="fa fa-inverse fa-stack-1x fa-cubes" style=""></span></span>');
             }
@@ -217,7 +215,7 @@ define([
             $titleSpan.append($('<div>').addClass('kbcb-app-card-title').append(info.name));
             if (isSdk) {
                 $titleSpan.append($('<div>').addClass('kbcb-app-card-module').append(
-                        $('<a href="#catalog/modules/' + module.module_name + '">')
+                    $('<a href="#catalog/modules/' + module.module_name + '">')
                         .append(module.module_name)
                         .on('click', function(event) {
                             // have to stop propagation so we don't go to the app page first
@@ -252,12 +250,12 @@ define([
 
             $appDiv.append(
                 $topDiv
-                .append($logoSpan)
-                .append($titleSpan));
+                    .append($logoSpan)
+                    .append($titleSpan));
 
 
             // SUBTITLE - on mouseover of info, show subtitle information
-            var $subtitle = $('<div>').addClass('kbcb-app-card-subtitle').append(info.subtitle).hide()
+            var $subtitle = $('<div>').addClass('kbcb-app-card-subtitle').append(info.subtitle).hide();
             $appDiv.append($subtitle);
 
             // FOOTER - stars, number of runs, and info mouseover area
@@ -272,7 +270,7 @@ define([
                     $star.on('click', function(event) {
                         event.stopPropagation();
                         if (!self.deactivatedStar && self.favoritesCallback) {
-                            self.favoritesCallback(self.info, self.favoritesCallbackParams)
+                            self.favoritesCallback(self);
                         }
                     });
                     $starDiv.tooltip({
@@ -288,7 +286,7 @@ define([
                 $footer.append($starDiv.append($star).append($starCount));
 
             } else {
-                $footer.append($('<div>').addClass('col-xs-3'))
+                $footer.append($('<div>').addClass('col-xs-3'));
             }
 
             if (isSdk) {
@@ -308,7 +306,7 @@ define([
                 }
                 $footer.append($nRuns);
             } else {
-                $footer.append($('<div>').addClass('col-xs-3'))
+                $footer.append($('<div>').addClass('col-xs-3'));
             }
 
             // version tags
