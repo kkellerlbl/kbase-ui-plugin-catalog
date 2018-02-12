@@ -26,10 +26,6 @@ define([
 
         this.cardsAdded = 0;
 
-
-        //this.favoritesCallback = favoritesCallback;
-        //this.favoritesCallbackParams = favoritesCallbackParams;
-
         this.show = function() {
             for (var k = 0; k < this.$divs.length; k++) {
                 this.$divs[k].show();
@@ -140,15 +136,14 @@ define([
                             placement: 'bottom',
                             container: 'body',
                             delay: { show: 400, hide: 40 }
-                        });;
+                        });
                 }
             }
         };
         this.getRunCount = function() {
             if (this.runCount) return this.runCount;
             return 0;
-        }
-
+        };
 
         this._renderFunctionCard = function() {
 
@@ -168,7 +163,7 @@ define([
                 .append('funcdef <span style="font-weight:bold">' + info.function_id + '</span>(...)'));
 
             $titleSpan.append($('<div>').addClass('kbcb-app-card-module').css({ 'padding-top': '4px' }).append(
-                    $('<a href="#catalog/modules/' + info.module_name + '">')
+                $('<a href="#catalog/modules/' + info.module_name + '">')
                     .append(info.module_name)
                     .on('click', function(event) {
                         // have to stop propagation so we don't go to the app page first
@@ -238,7 +233,7 @@ define([
 
             for (var r = 0; r < info.release_tag.length; r++) {
                 var rts = info.release_tag;
-                for (var r = 0; r < rts.length; r++) {
+                for (r = 0; r < rts.length; r++) {
                     if (rts[r] === 'release') {
                         $releaseTagsDiv.append($('<span>').addClass('label label-primary').css({ 'padding': '.3em .6em .3em' })
                             .append('R')

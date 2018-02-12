@@ -26,7 +26,6 @@ define([
         options: {
             module_name: null
         },
-        $mainPanel: null,
         $errorPanel: null,
 
         // clients to the catalog service and the NarrativeMethodStore
@@ -100,8 +99,8 @@ define([
                         self.renderApps();
                         self.renderFunctions();
                         return p;
-                    })
-            }).catch(function (err) {
+                    });
+            }).catch(function () {
                 self.hideLoading();
             });
 
@@ -112,24 +111,24 @@ define([
         renderCollapsableVersionDiv: function (title, $content) {
             // todo: replace this cut/paste with a function
             var $div = $('<div>').css('margin-top', '1em');
-            var $content = $('<div>').css('margin', '1em').append($content).hide();
+            $content = $('<div>').css('margin', '1em').append($content).hide();
             var $toggle = $('<i>').addClass('fa fa-chevron-right').css('margin-left', '15px');
             $div.append(
                 $('<div>').css('cursor', 'pointer')
-                .append($('<h4>').append(title).css('display', 'inline'))
-                .append($toggle)
-                .on('click', function () {
-                    if ($toggle.hasClass('fa-chevron-right')) {
-                        // hidden, so show
-                        $toggle.removeClass('fa-chevron-right');
-                        $toggle.addClass('fa-chevron-down');
-                        $content.slideDown();
-                    } else {
-                        $toggle.removeClass('fa-chevron-down');
-                        $toggle.addClass('fa-chevron-right');
-                        $content.slideUp();
-                    }
-                }));
+                    .append($('<h4>').append(title).css('display', 'inline'))
+                    .append($toggle)
+                    .on('click', function () {
+                        if ($toggle.hasClass('fa-chevron-right')) {
+                            // hidden, so show
+                            $toggle.removeClass('fa-chevron-right');
+                            $toggle.addClass('fa-chevron-down');
+                            $content.slideDown();
+                        } else {
+                            $toggle.removeClass('fa-chevron-down');
+                            $toggle.addClass('fa-chevron-right');
+                            $content.slideUp();
+                        }
+                    }));
             $div.append($content);
             return $div;
         },
@@ -142,7 +141,7 @@ define([
             var versions = self.moduleDetails.versions;
 
             // determine current version
-            var verStrHeader = '(under development)'
+            var verStrHeader = '(under development)';
             if (self.moduleDetails.info.release) {
                 verStrHeader = self.moduleDetails.info.release.version;
             } else if (self.moduleDetails.beta) {
@@ -211,8 +210,8 @@ define([
                 $versionDiv.append(self.renderCollapsableVersionDiv(
                     'Development Version',
                     $('<div>')
-                    .append('<a href="#catalog/status/' + info.module_name + '">View recent registrations</a><br><br>')
-                    .append(self.renderVersion('dev', info.dev))
+                        .append('<a href="#catalog/status/' + info.module_name + '">View recent registrations</a><br><br>')
+                        .append(self.renderVersion('dev', info.dev))
                 ));
             } else {
                 $versionDiv.append('<i>This module has not yet completed a successful registration.</i>');
@@ -286,9 +285,9 @@ define([
             if (version.local_functions) {
                 if (version.local_functions.length > 0) {
                     $verDiv.append('<br>');
-                    var $l = $('<ul>');
-                    for (var i = 0; i < version.local_functions.length; i++) {
-                        var id = version.local_functions[i];
+                    $l = $('<ul>');
+                    for (i = 0; i < version.local_functions.length; i++) {
+                        id = version.local_functions[i];
                         $l.append('<li><a href="#catalog/functions/' + this.moduleDetails.info.module_name + '/' + id +
                             '/' + version.git_commit_hash + '">' + id + '</a></li>');
                     }
@@ -312,29 +311,29 @@ define([
 
             $adminDiv.append(
                 $('<div>').css('cursor', 'pointer')
-                .append($('<h4>').append('Module Admin Tools').css('display', 'inline'))
-                .append($minMaxToggle)
-                .on('click', function () {
-                    if ($minMaxToggle.hasClass('fa-chevron-right')) {
-                        // hidden, so show
-                        $minMaxToggle.removeClass('fa-chevron-right');
-                        $minMaxToggle.addClass('fa-chevron-down');
-                        $adminContent.slideDown();
-                    } else {
-                        $minMaxToggle.removeClass('fa-chevron-down');
-                        $minMaxToggle.addClass('fa-chevron-right');
-                        $adminContent.slideUp();
-                    }
-                }));
+                    .append($('<h4>').append('Module Admin Tools').css('display', 'inline'))
+                    .append($minMaxToggle)
+                    .on('click', function () {
+                        if ($minMaxToggle.hasClass('fa-chevron-right')) {
+                            // hidden, so show
+                            $minMaxToggle.removeClass('fa-chevron-right');
+                            $minMaxToggle.addClass('fa-chevron-down');
+                            $adminContent.slideDown();
+                        } else {
+                            $minMaxToggle.removeClass('fa-chevron-down');
+                            $minMaxToggle.addClass('fa-chevron-right');
+                            $adminContent.slideUp();
+                        }
+                    }));
 
             $adminContent.append('<br><a href="#catalog/status/' +
-                self.moduleDetails.info.module_name + '">View recent registrations</a><br>')
+                self.moduleDetails.info.module_name + '">View recent registrations</a><br>');
 
             $adminContent.append('<br><b>Module state information:</b>');
             var $stateTable = $('<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">');
             $adminContent.append($('<div>').css({ 'width': '500px', 'margin-left': '2em' }).append($stateTable));
-            var width = '15%'
-            var state = self.moduleDetails.state
+            var width = '15%';
+            var state = self.moduleDetails.state;
             for (var key in state) {
                 if (state.hasOwnProperty(key)) {
                     $stateTable.append('<tr><th width="' + width + '">' + key + '</th><td>' + JSON.stringify(state[key]) + '</td></tr>');
@@ -343,51 +342,51 @@ define([
 
             $adminContent.append(
                 $('<div>')
-                .append('<b>Register a New Dev Version:</b>')
-                .append(self.renderRegisterDiv())
+                    .append('<b>Register a New Dev Version:</b>')
+                    .append(self.renderRegisterDiv())
             );
             var $manageStatusPanel = $('<div>').css('margin', '1.0em');
             $adminContent.append(
                 $('<div>').css('margin-top', '1em')
-                .append('<b>Manage Releases:</b><br>')
-                .append(
-                    $('<button>').addClass('btn btn-default').append('Migrate Current Dev Version to Beta')
-                    .on('click', function () {
-                        self.catalog.push_dev_to_beta({ module_name: self.module_name })
-                            .then(function () {
-                                $manageStatusPanel
-                                    .prepend($('<div role=alert>').addClass('alert alert-success')
-                                        .append('Beta version updated.  Refresh the page to see the update.'));
+                    .append('<b>Manage Releases:</b><br>')
+                    .append(
+                        $('<button>').addClass('btn btn-default').append('Migrate Current Dev Version to Beta')
+                            .on('click', function () {
+                                self.catalog.push_dev_to_beta({ module_name: self.module_name })
+                                    .then(function () {
+                                        $manageStatusPanel
+                                            .prepend($('<div role=alert>').addClass('alert alert-success')
+                                                .append('Beta version updated.  Refresh the page to see the update.'));
 
-                            })
-                            .catch(function (err) {
-                                console.error('ERROR in migrating dev to beta');
-                                console.error(err);
-                                $manageStatusPanel
-                                    .prepend($('<div role=alert>').addClass('alert alert-danger')
-                                        .append('<b>Error:</b> ' + err.error.message));
-                            });
-                    }))
-                .append('&nbsp;&nbsp;&nbsp;')
-                .append(
-                    $('<button>').addClass('btn btn-default').append('Request New Release')
-                    .on('click', function () {
-                        self.catalog.request_release({ module_name: self.module_name })
-                            .then(function () {
-                                $manageStatusPanel
-                                    .prepend($('<div role=alert>').addClass('alert alert-success')
-                                        .append('Your request has been submitted.'));
+                                    })
+                                    .catch(function (err) {
+                                        console.error('ERROR in migrating dev to beta');
+                                        console.error(err);
+                                        $manageStatusPanel
+                                            .prepend($('<div role=alert>').addClass('alert alert-danger')
+                                                .append('<b>Error:</b> ' + err.error.message));
+                                    });
+                            }))
+                    .append('&nbsp;&nbsp;&nbsp;')
+                    .append(
+                        $('<button>').addClass('btn btn-default').append('Request New Release')
+                            .on('click', function () {
+                                self.catalog.request_release({ module_name: self.module_name })
+                                    .then(function () {
+                                        $manageStatusPanel
+                                            .prepend($('<div role=alert>').addClass('alert alert-success')
+                                                .append('Your request has been submitted.'));
 
-                            })
-                            .catch(function (err) {
-                                console.error('ERROR in migrating dev to beta');
-                                console.error(err);
-                                $manageStatusPanel
-                                    .prepend($('<div role=alert>').addClass('alert alert-danger')
-                                        .append('<b>Error:</b> ' + err.error.message));
-                            });
-                    }))
-                .append($manageStatusPanel)
+                                    })
+                                    .catch(function (err) {
+                                        console.error('ERROR in migrating dev to beta');
+                                        console.error(err);
+                                        $manageStatusPanel
+                                            .prepend($('<div role=alert>').addClass('alert alert-danger')
+                                                .append('<b>Error:</b> ' + err.error.message));
+                                    });
+                            }))
+                    .append($manageStatusPanel)
             );
 
             $adminDiv.append($adminContent);
@@ -397,8 +396,8 @@ define([
 
         renderRegisterDiv: function () {
             var self = this;
-            var $logWidgetDiv = $('<div>')
-            var logWidget = $logWidgetDiv['KBaseCatalogRegistration']({
+            var $logWidgetDiv = $('<div>');
+            $logWidgetDiv['KBaseCatalogRegistration']({
                 runtime: self.runtime,
                 git_url: self.moduleDetails.info.original_git_url,
                 show_title: false,
@@ -449,10 +448,10 @@ define([
                     token: this.runtime.service('session').getAuthToken() 
                 });
             this.nms_base_url = this.runtime.getConfig('services.narrative_method_store.url');
-            this.nms_base_url = this.nms_base_url.substring(0, this.nms_base_url.length - 3)
+            this.nms_base_url = this.nms_base_url.substring(0, this.nms_base_url.length - 3);
         },
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
 
             var $header = $('<div>').css('margin', '1em');
@@ -493,19 +492,18 @@ define([
         // we assume context is:
         //    catalog: catalog_client
         //    browserWidget: this widget, so we can toggle any update
-        toggleFavorite: function (info, context) {
-            var appCard = this;
+        toggleFavorite: function (appCard) {
             var params = {};
-            if (info.module_name) {
-                params['module_name'] = info.module_name;
-                params['id'] = info.id.split('/')[1]
+            if (appCard.info.module_name) {
+                params['module_name'] = appCard.info.module_name;
+                params['id'] = appCard.info.id.split('/')[1];
             } else {
-                params['id'] = info.id;
+                params['id'] = appCard.info.id;
             }
 
             // check if is a favorite
             if (appCard.isStarOn()) {
-                context.catalog.remove_favorite(params)
+                this.catalog.remove_favorite(params)
                     .then(function () {
                         appCard.turnOffStar();
                         appCard.setStarCount(appCard.getStarCount() - 1);
@@ -515,14 +513,13 @@ define([
                         console.error(err);
                     });
             } else {
-                context.catalog.add_favorite(params)
+                this.catalog.add_favorite(params)
                     .then(function () {
                         appCard.turnOnStar();
                         appCard.setStarCount(appCard.getStarCount() + 1);
                     })
                     .catch(function (err) {
-                        console.error('ERROR');
-                        console.error(err);
+                        console.error('ERROR', err);
                     });
             }
         },
@@ -536,7 +533,7 @@ define([
                         var c = counts[k];
                         var lookup = c.id;
                         if (c.module_name_lc != 'nms.legacy') {
-                            lookup = c.module_name_lc + '/' + lookup
+                            lookup = c.module_name_lc + '/' + lookup;
                         }
                         if (self.appLookup[lookup]) {
                             self.appLookup[lookup].setStarCount(c.count);
@@ -551,7 +548,7 @@ define([
         },
 
         updateMyFavorites: function () {
-            var self = this
+            var self = this;
             if (self.runtime.service('session').isLoggedIn()) {
                 return self.catalog.list_favorites(self.runtime.service('session').getUsername())
                     .then(function (favorites) {
@@ -560,7 +557,7 @@ define([
                             var fav = self.favoritesList[k];
                             var lookup = fav.id;
                             if (fav.module_name_lc != 'nms.legacy') {
-                                lookup = fav.module_name_lc + '/' + lookup
+                                lookup = fav.module_name_lc + '/' + lookup;
                             }
                             if (self.appLookup[lookup]) {
                                 self.appLookup[lookup].turnOnStar();
@@ -576,7 +573,7 @@ define([
         },
 
         updateRunStats: function () {
-            var self = this
+            var self = this;
 
             var ids = [];
             for (var a in self.appLookup) {
@@ -659,7 +656,9 @@ define([
                             app: info_list[k],
                             module: self.moduleDetails.info,
                             nms_base_url: self.nms_base_url,
-                            favoritesCallback: self.toggleFavorite,
+                            favoritesCallback: function () {
+                                self.toggleFavorite.apply(self, arguments);
+                            },
                             favoritesCallbackParams: { catalog: self.catalog, browserWidget: self },
                             isLoggedIn: self.runtime.service('session').isLoggedIn(),
                             showReleaseTagLabels: true,
@@ -724,7 +723,7 @@ define([
                     self.moduleDetails.info = info;
                     var git_url = self.moduleDetails.info.git_url;
                     self.moduleDetails.info['original_git_url'] = self.moduleDetails.info.git_url;
-                    var github = 'https://github.com/'
+                    var github = 'https://github.com/';
                     if (git_url.substring(0, github.length) === github) {
                         self.isGithub = true;
                         // if it ends with .git and is github, truncate so we get the basic url
@@ -742,7 +741,7 @@ define([
         },
 
         getModuleVersions: function () {
-            var self = this
+            var self = this;
 
             var moduleSelection = {
                 module_name: self.module_name
@@ -773,7 +772,7 @@ define([
         },
 
         getModuleStatus: function () {
-            var self = this
+            var self = this;
 
             var moduleSelection = {
                 module_name: self.module_name
@@ -817,7 +816,7 @@ define([
         },
 
         checkIsAdmin: function () {
-            var self = this
+            var self = this;
 
             var me = self.runtime.service('session').getUsername();
             return self.catalog.is_admin(me)

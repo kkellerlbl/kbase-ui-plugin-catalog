@@ -3,6 +3,7 @@ define([
     'bluebird',
     'kb_service/client/narrativeMethodStore',
     'kb_service/client/catalog',
+    'kb_common/jsonRpc/genericClient',
     '../catalog_util',
     '../app_card',
     'yaml!../data/categories.yml',
@@ -15,11 +16,13 @@ define([
     Promise,
     NarrativeMethodStore,
     Catalog,
+    GenericClient,
     CatalogUtil,
     AppCard,
     categoriesConfig
 ) {
     'use strict';
+
     $.KBWidget({
         name: 'KBaseCatalogBrowser',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -31,6 +34,8 @@ define([
         // clients to the catalog service and the NarrativeMethodStore
         catalog: null,
         nms: null,
+        catalogClient: null,
+        nmsClient: null,
 
         // list of NMS method and app info (todo: we need to move this to the catalog)
         // for now, most of the filtering/sorting etc is done on the front end; this
@@ -167,6 +172,16 @@ define([
                     token: this.runtime.service('session').getAuthToken()
                 }
             );
+            this.catalogClient = new GenericClient({
+                module: 'Catalog',
+                url: this.runtime.config('services.catalog.url'),
+                token: this.runtime.service('session').getAuthToken()
+            });
+            this.nmsClient = new GenericClient({
+                module: 'NarrativeMethodStore',
+                url: this.runtime.config('services.narrative_method_store.url'),
+                token: this.runtime.service('session').getAuthToken()
+            });
             this.nms_base_url = this.runtime.getConfig('services.narrative_method_store.url');
             this.nms_base_url = this.nms_base_url.substring(0, this.nms_base_url.length - 3);
         },
@@ -188,10 +203,9 @@ define([
 
             // SEARCH
             var $searchBox = $('<input type="text" placeholder="Search" size="50">').addClass('form-control');
-            $searchBox.on('input',
-                    function () {
-                        self.filterApps($searchBox.val());
-                    })
+            $searchBox.on('input', function () {
+                self.filterApps($searchBox.val());
+            })
                 .bind('keypress', function (e) {
                     if (e.keyCode === 13) {
                         return false;
@@ -311,8 +325,8 @@ define([
 
             var $helpLink = $('<li>').append($('<a href="https://kbase.us/apps">').append('<i class="fa fa-question-circle"></i> Help'));
             self.$ctrList
-              .append($version)
-              .append($helpLink);
+                .append($version)
+                .append($helpLink);
         },
 
         addDeveloperControls: function () {
@@ -443,9 +457,6 @@ define([
                     $(sections[i]).hide();
                 }
             }
-
-
-
         },
 
         clearFilter: function () {
@@ -455,7 +466,7 @@ define([
             }
         },
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
             var $appListPanel = $('<div>');
             var $moduleListPanel = $('<div>');
@@ -478,40 +489,37 @@ define([
         // we assume context is:
         //    catalog: catalog_client
         //    browserWidget: this widget, so we can toggle any update
-        toggleFavorite: function (info, context) {
-            var appCard = this;
+        toggleFavorite: function (appCard) {
             var params = {};
-            if (info.module_name) {
-                params['module_name'] = info.module_name;
-                params['id'] = info.id.split('/')[1];
+            if (appCard.info.module_name) {
+                params.module_name = appCard.info.module_name;
+                params.id = appCard.info.id.split('/')[1];
             } else {
-                params['id'] = info.id;
+                params.id = appCard.info.id;
             }
 
             // check if is a favorite
             if (appCard.isStarOn()) {
-                context.catalog.remove_favorite(params)
+                this.catalogClient.callFunc('remove_favorite', [params])
                     .then(function () {
                         appCard.turnOffStar();
                         appCard.setStarCount(appCard.getStarCount() - 1);
-                        context.browserWidget.updateMyFavorites();
-                        return context.browserWidget.updateFavoritesCounts();
+                        this.updateMyFavorites();
+                        return this.updateFavoritesCounts();
                     })
                     .catch(function (err) {
-                        console.error('ERROR');
-                        console.error(err);
+                        console.error('ERROR', err);
                     });
             } else {
-                context.catalog.add_favorite(params)
+                this.catalogClient.callFunc('add_favorite', [params])
                     .then(function () {
                         appCard.turnOnStar();
                         appCard.setStarCount(appCard.getStarCount() + 1);
-                        context.browserWidget.updateMyFavorites();
-                        return context.browserWidget.updateFavoritesCounts();
+                        this.updateMyFavorites();
+                        return this.updateFavoritesCounts();
                     })
                     .catch(function (err) {
-                        console.error('ERROR');
-                        console.error(err);
+                        console.error('ERROR', err);
                     });
             }
         },
@@ -521,13 +529,13 @@ define([
             var self = this;
 
             // determine which set of methods to fetch
-            return self.nms.list_methods({ tag: tag })
-                .then(function (apps) {
+            return self.nmsClient.callFunc('list_methods', [{tag: tag}])
+            // return self.nms.list_methods({ tag: tag })
+                .spread(function (apps) {
                     self.apps = apps;
                 })
                 .catch(function (err) {
-                    console.error('ERROR');
-                    console.error(err);
+                    console.error('ERROR', err);
                 });
         },
 
@@ -536,13 +544,13 @@ define([
             var self = this;
 
             // apps cannot be registered via the SDK, so don't have tag info
-            return self.nms.list_apps({})
-                .then(function (legacyApps) {
+            return self.nmsClient.callFunc('list_apps', [{}])
+            // return self.nms.list_apps({})
+                .spread(function (legacyApps) {
                     self.legacyApps = legacyApps;
                 })
                 .catch(function (err) {
-                    console.error('ERROR');
-                    console.error(err);
+                    console.error('ERROR', err);
                 });
         },
 
@@ -558,17 +566,16 @@ define([
                 moduleSelection['include_unreleased'] = 0;
             }
 
-            return self.catalog.list_basic_module_info(moduleSelection)
-                .then(function (modules) {
+            return self.catalogClient.callFunc('list_basic_module_info', [moduleSelection])
+            // return self.catalog.list_basic_module_info(moduleSelection)
+                .spread(function (modules) {
                     self.moduleLookup = {}; // {module_name: {info:{}, hash1:'tag', hash:'tag', ...}
-                    var tags = ['release', 'beta', 'dev'];
                     for (var k = 0; k < modules.length; k++) {
                         self.moduleLookup[modules[k]['module_name']] = modules[k];
                     }
                 })
                 .catch(function (err) {
-                    console.error('ERROR');
-                    console.error(err);
+                    console.error('ERROR', err);
                 });
         },
 
@@ -577,8 +584,9 @@ define([
 
             var options = {};
 
-            return self.catalog.get_exec_aggr_stats(options)
-                .then(function (stats) {
+            return self.catalogClient.callFunc('get_exec_aggr_stats', [options])
+            // return self.catalog.get_exec_aggr_stats(options)
+                .spread(function (stats) {
                     self.runStats = stats;
                     for (var k = 0; k < stats.length; k++) {
 
@@ -593,16 +601,16 @@ define([
                     }
                 })
                 .catch(function (err) {
-                    console.error('ERROR');
-                    console.error(err);
+                    console.error('ERROR', err);
                 });
         },
 
         isDeveloper: function () {
             var self = this;
-
-            return self.catalog.is_approved_developer([self.runtime.service('session').getUsername()])
-                .then(function (isDev) {
+            var currentUsername = self.runtime.service('session').getUsername();
+            return self.catalogClient.callFunc('is_approved_developer', [[currentUsername]])
+            // return self.catalog.is_approved_developer([username])
+                .spread(function (isDev) {
                     if (isDev && isDev.length > 0 && isDev[0] === 1) {
                         self.addDeveloperControls();
                     } else {
@@ -610,16 +618,16 @@ define([
                     }
                 })
                 .catch(function (err) {
-                    console.error('ERROR');
-                    console.error(err);
+                    console.error('ERROR', err);
                 });
         },
 
         updateFavoritesCounts: function () {
             var self = this;
             var listFavoritesParams = {};
-            return self.catalog.list_favorite_counts(listFavoritesParams)
-                .then(function (counts) {
+            return self.catalogClient.callFunc('list_favorite_counts', [listFavoritesParams])
+            // return self.catalog.list_favorite_counts(listFavoritesParams)
+                .spread(function (counts) {
                     for (var k = 0; k < counts.length; k++) {
                         var c = counts[k];
                         var lookup = c.id;
@@ -632,8 +640,7 @@ define([
                     }
                 })
                 .catch(function (err) {
-                    console.error('ERROR');
-                    console.error(err);
+                    console.error('ERROR', err);
                 });
         },
 
@@ -641,8 +648,10 @@ define([
         updateMyFavorites: function () {
             var self = this;
             if (self.isLoggedIn) {
-                return self.catalog.list_favorites(self.runtime.service('session').getUsername())
-                    .then(function (favorites) {
+                var currentUsername = self.runtime.service('session').getUsername();
+                return self.catalogClient.callFunc('list_favorites', [currentUsername])
+                // return self.catalog.list_favorites(currentUsername)
+                    .spread(function (favorites) {
                         self.favoritesList = favorites;
                         for (var k = 0; k < self.favoritesList.length; k++) {
                             var fav = self.favoritesList[k];
@@ -656,8 +665,7 @@ define([
                         }
                     })
                     .catch(function (err) {
-                        console.error('ERROR');
-                        console.error(err);
+                        console.error('ERROR', err);
                     });
             }
         },
@@ -693,7 +701,6 @@ define([
                 //    app:  { .. }  // app info returned (for now) from NMS
                 //    module: { .. }  // module info returned for SDK methods
                 //    favoritesCallback: function () // function called when favorites button is clicked
-                //    favoritesCallbackParams: {} // parameters passed on to the callback function
                 //    isLoggedIn: true | false
 
                 var m = new AppCard({
@@ -701,8 +708,9 @@ define([
                     app: self.apps[k],
                     module: self.moduleLookup[self.apps[k]['module_name']],
                     nms_base_url: self.nms_base_url,
-                    favoritesCallback: self.toggleFavorite,
-                    favoritesCallbackParams: { catalog: self.catalog, browserWidget: self },
+                    favoritesCallback: function () {
+                        self.toggleFavorite.apply(self, arguments);
+                    },
                     isLoggedIn: self.isLoggedIn,
                     showReleaseTagLabels: self.showReleaseTagLabels,
                     linkTag: self.options.tag
@@ -718,7 +726,7 @@ define([
             }
 
             // HANDLE LEGACY APPS!!
-            for (var k = 0; k < self.legacyApps.length; k++) {
+            for (k = 0; k < self.legacyApps.length; k++) {
                 if (self.legacyApps[k].loading_error) {
                     console.warn('Error in spec, will not be loaded:', self.legacyApps[k]);
                     continue;
@@ -797,7 +805,7 @@ define([
                 $catDivLookup[category] = $catDiv;
                 $section.append(
                     $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append(this.categories[category])));
+                        .append($('<h4>').append(this.categories[category])));
                 $section.append($catDiv);
                 this.$appListPanel.append($section);
             }.bind(this));
@@ -805,7 +813,7 @@ define([
             var $noCatDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $section.append(
                 $('<div>').css({ 'color': '#777' })
-                .append($('<h4>').append('Uncategorized')));
+                    .append($('<h4>').append('Uncategorized')));
             $section.append($noCatDiv);
             this.$appListPanel.append($section);
 
@@ -924,26 +932,26 @@ define([
 
             // create the sections per author
             var $authorDivLookup = {};
-            for (var k = 0; k < devs.length; k++) {
+            for (k = 0; k < devs.length; k++) {
                 var $section = $('<div>').addClass('catalog-section');
                 var $authorDiv = $('<div>').addClass('kbcb-app-card-list-container');
                 $authorDivLookup[devs[k]] = $authorDiv;
                 $section.append(
                     $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append('<a href="#people/' + devs[k] + '">' + devs[k] + '</a>')));
+                        .append($('<h4>').append('<a href="#people/' + devs[k] + '">' + devs[k] + '</a>')));
                 $section.append($authorDiv);
                 this.$appListPanel.append($section);
             }
-            var $section = $('<div>').addClass('catalog-section');
+            $section = $('<div>').addClass('catalog-section');
             var $noAuthorDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $section.append(
                 $('<div>').css({ 'color': '#777' })
-                .append($('<h4>').append('No Developer Specified')));
+                    .append($('<h4>').append('No Developer Specified')));
             $section.append($noAuthorDiv);
             this.$appListPanel.append($section);
 
             // render the app list
-            for (var k = 0; k < this.appList.length; k++) {
+            for (k = 0; k < this.appList.length; k++) {
                 this.appList[k].clearCardsAddedCount();
                 if (this.appList[k].info.app_type === 'app') {
                     if (this.appList[k].info.authors.length > 0) {
@@ -990,7 +998,7 @@ define([
             var $myDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $mySection.append(
                 $('<div>').css({ 'color': '#777' })
-                .append($('<h4>').append('My Favorites')));
+                    .append($('<h4>').append('My Favorites')));
             $mySection.append($myDiv);
             this.$appListPanel.append($mySection);
 
@@ -998,7 +1006,7 @@ define([
             var $otherDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $otherSection.append(
                 $('<div>').css({ 'color': '#777' })
-                .append($('<h4>').append('Everything Else')));
+                    .append($('<h4>').append('Everything Else')));
             $otherSection.append($otherDiv);
             this.$appListPanel.append($otherSection);
             var hasFavorites = false;
@@ -1051,30 +1059,29 @@ define([
 
             // create the sections per type
             var $typeDivLookup = {};
-            for (var k = 0; k < types.length; k++) {
+            for (k = 0; k < types.length; k++) {
                 var $section = $('<div>').addClass('catalog-section');
                 var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
                 $typeDivLookup[types[k]] = $typeDiv;
                 $section.append(
                     $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
+                        .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
                 $section.append($typeDiv);
                 this.$appListPanel.append($section);
             }
 
             // create section for apps without an input type
-            var typeId = 'none';
-            var $section = $('<div>').addClass('catalog-section');
-            var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
+            $section = $('<div>').addClass('catalog-section');
+            $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $typeDivLookup.none = $typeDiv;
             $section.append(
                 $('<div>').css({ 'color': '#777' })
-                .append($('<h4>').append($('<span>None</span>').append(types[k]))));
+                    .append($('<h4>').append($('<span>None</span>').append(types[k]))));
             $section.append($typeDiv);
             this.$appListPanel.append($section);
 
             // render the app list
-            for (var k = 0; k < this.appList.length; k++) {
+            for (k = 0; k < this.appList.length; k++) {
                 this.appList[k].clearCardsAddedCount();
                 if (this.appList[k].info.app_type === 'app') {
                     if (this.appList[k].info.input_types.length > 0) {
@@ -1099,31 +1106,30 @@ define([
 
             // create the sections per output type
             var $typeDivLookup = {};
-            for (var k = 0; k < types.length; k++) {
+            for (k = 0; k < types.length; k++) {
                 var $section = $('<div>').addClass('catalog-section');
                 var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
                 $typeDivLookup[types[k]] = $typeDiv;
                 $section.append(
                     $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
+                        .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
                 $section.append($typeDiv);
                 this.$appListPanel.append($section);
             }
 
 
             // create section for apps without an output type
-            var typeId = 'none';
-            var $section = $('<div>').addClass('catalog-section');
-            var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
+            $section = $('<div>').addClass('catalog-section');
+            $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $typeDivLookup.none = $typeDiv;
             $section.append(
                 $('<div>').css({ 'color': '#777' })
-                .append($('<h4>').append($('<span>None</span>').append(types[k]))));
+                    .append($('<h4>').append($('<span>None</span>').append(types[k]))));
             $section.append($typeDiv);
             this.$appListPanel.append($section);
 
             // render the app list
-            for (var k = 0; k < this.appList.length; k++) {
+            for (k = 0; k < this.appList.length; k++) {
                 this.appList[k].clearCardsAddedCount();
 
                 if (this.appList[k].info.app_type === 'app') {
