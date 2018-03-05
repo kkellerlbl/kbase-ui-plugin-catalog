@@ -620,7 +620,7 @@ define([
             this.metricsClient = new DynamicService({
                 url: this.runtime.getConfig('services.service_wizard.url'),
                 token: token,
-                version: 'dev',
+                //version: 'dev',
                 module: 'kb_Metrics',
             });
 
