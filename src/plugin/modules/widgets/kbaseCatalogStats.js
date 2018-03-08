@@ -396,6 +396,7 @@ define([
                         { text: 'End Time', id: 'finish_time', isSortable: true },
                         { text: 'Run Time', id: 'run_time', isSortable: true },
                         { text: 'Status', id: 'result', isSortable: true },
+                        { text: 'Client Groups', id: 'client_groups', isSortable: true },
                     ],
                 };
 
@@ -849,6 +850,10 @@ define([
                     job.queue_time = job.exec_start_time
                       ? job.exec_start_time - job.creation_time
                       : 0;
+
+                    if (job.client_groups) {
+                      job.client_groups = job.client_groups.join(',');
+                    }
 
                     self.adminRecentRuns.push(job);
 
