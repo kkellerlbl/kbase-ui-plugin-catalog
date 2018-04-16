@@ -265,7 +265,7 @@ define([
                                                 $container.removeClass('kbcb-active-filter');
                                             }
 
-                                            getLatestRunsInCustomRange(self.thenDate, self.nowDate);
+                                            getLatestRunsInCustomRange(self.thenDate, self.nowDate, true);
 
                                         })
                                 )
@@ -278,13 +278,13 @@ define([
                        and re-calls the get_app_metrics() function. It'll blank out the table and show the loading element and then re-call
                        the function. Once it's back, it'll update the updateFunction and re-populate the table.
                     */
-                var getLatestRunsInCustomRange = function (fromDate, toDate) {
+                var getLatestRunsInCustomRange = function (fromDate, toDate, cached) {
                     self.thenDate = fromDate;
                     self.nowDate = toDate;
 
                     var currentTime = ( new Date() ).getTime();
 
-                    if (self.lastRunTime + self.options.rerunDuration * 1000 > currentTime) {
+                    if (cached && self.lastRunTime + self.options.rerunDuration * 1000 > currentTime) {
                       var rows = makeRecentRunsTableRows();
                       $adminRecentRunsTable.currentPage = 0;
                       $adminRecentRunsTable.options.updateFunction = self.createDynamicUpdateFunction(adminRecentRunsConfig, rows);
