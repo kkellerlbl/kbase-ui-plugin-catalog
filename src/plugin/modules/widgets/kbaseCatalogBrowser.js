@@ -1,3 +1,4 @@
+console.log("CATALOG BROWSER");
 define([
     'jquery',
     'bluebird',
