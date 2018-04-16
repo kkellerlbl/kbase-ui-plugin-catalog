@@ -284,7 +284,7 @@ define([
 
                     var currentTime = ( new Date() ).getTime();
 
-                    if (cached && self.lastRunTime + self.options.rerunDuration * 1000 > currentTime) {
+                    if (cached && self.lastRunTime) {
                       var rows = makeRecentRunsTableRows();
                       $adminRecentRunsTable.currentPage = 0;
                       $adminRecentRunsTable.options.updateFunction = self.createDynamicUpdateFunction(adminRecentRunsConfig, rows);
@@ -304,6 +304,30 @@ define([
                         });
                 };
 
+                var refreshInTimeRange = function ($rangeSelector, $customDiv) {
+
+                    self.numHoursField.text($rangeSelector.find('option:selected').text().toLowerCase());
+
+                    if ($rangeSelector.val() === 'custom') {
+                        var now = (new Date()).getTime();
+                        var then = now - self.options.numHours * 60 * 60 * 1000;
+                        $customDiv.show();
+                        var inputs = $customDiv.find('input');
+
+                        $(inputs[0]).val((new Date(then)).toLocaleString());
+                        $(inputs[1]).val((new Date(now)).toLocaleString());
+                    }
+                    else {
+                        self.nowDate = undefined;
+                        self.thenDate = undefined;
+                        $customDiv.hide();
+
+                        self.options.numHours = $rangeSelector.val();
+
+                        getLatestRunsInCustomRange(undefined, undefined);
+                    }
+                };
+
                 var $adminRecentRunsFilterContainer = $('<div>')
                     .addClass('row')
                     .css('margin-bottom', '10px')
@@ -318,39 +342,24 @@ define([
                            turn them into calendar pop ups. Only so many hours in a day.
                         */
                         $.jqElem('div')
-                            .addClass('col-sm-3')
+                            .addClass('col-sm-3 text-right')
                             .append(
                                 $.jqElem('select')
+                                    .css({float : 'left', 'width' : '85%'})
                                     .addClass('form-control')
                                     .append($.jqElem('option').attr('value', 1).append('Last hour'))
                                     .append($.jqElem('option').attr('value', 48).prop('selected', true).append('Last 48 hours'))
                                     .append($.jqElem('option').attr('value', 24 * 7).append('Last week'))
                                     .append($.jqElem('option').attr('value', 24 * 30).append('Last month'))
                                     .append($.jqElem('option').attr('value', 'custom').append('Custom Range'))
-                                    .on('change', function (e) {
-
-                                        var $customDiv = $(e.target).next();
-                                        self.numHoursField.text($(e.target).find('option:selected').text().toLowerCase());
-
-                                        if ($(e.target).val() === 'custom') {
-                                            var now = (new Date()).getTime();
-                                            var then = now - self.options.numHours * 60 * 60 * 1000;
-                                            $customDiv.show();
-                                            var inputs = $customDiv.find('input');
-
-                                            $(inputs[0]).val((new Date(then)).toLocaleString());
-                                            $(inputs[1]).val((new Date(now)).toLocaleString());
-                                        }
-                                        else {
-                                            self.nowDate = undefined;
-                                            self.thenDate = undefined;
-                                            $customDiv.hide();
-
-                                            self.options.numHours = $(e.target).val();
-
-                                            getLatestRunsInCustomRange(undefined, undefined);
-                                        }
-                                    })
+                                    .on('change', function(e) { refreshInTimeRange($(e.currentTarget), $(e.currentTarget).next().next()) })
+                            )
+                            .append(
+                              $.jqElem('button')
+                                .addClass('btn btn-default')
+                                .on('click', function(e) { refreshInTimeRange($(e.currentTarget).prev(), $(e.currentTarget).next()) })
+                                .attr('title', 'Refresh jobs data')
+                                .append($.jqElem('i').addClass('fa fa-refresh'))
                             )
                             .append(
                             /* And this div contains the range input boxes, which are hidden below the selectbox until
