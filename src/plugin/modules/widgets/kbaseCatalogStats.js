@@ -41,6 +41,8 @@ define([
             includeUserRunSummary: true,
             includePublicStats: true,
             useUserRecentRuns: false,
+
+            rerunDuration : 30,
         },
 
         // clients to the catalog service and the NarrativeMethodStore
@@ -247,26 +249,27 @@ define([
                                     $('<input>')
                                         .attr('type', 'checkbox')
                                         .addClass('form-check-input')
+                                        .on('click', function (e) {
+                                            var $target = $(e.target);
+                                            var $container = $target.prop('tagName') === 'LABEL'
+                                                ? $target
+                                                : $target.parent()
+                                                ;
+
+                                            activeFilters[filter] = $target.prop('checked');
+
+                                            if (activeFilters[filter]) {
+                                                $container.addClass('kbcb-active-filter');
+                                            }
+                                            else {
+                                                $container.removeClass('kbcb-active-filter');
+                                            }
+
+                                            getLatestRunsInCustomRange(self.thenDate, self.nowDate);
+
+                                        })
                                 )
                                 .append(' ' + filterLabel + ' ')
-                                .on('click', function (e) {
-                                    var $target = $(e.target);
-                                    var $container = $target.prop('tagName') === 'LABEL'
-                                        ? $target
-                                        : $target.parent()
-                                        ;
-
-                                    activeFilters[filter] = $target.prop('checked');
-
-                                    if (activeFilters[filter]) {
-                                        $container.addClass('kbcb-active-filter');
-                                    }
-                                    else {
-                                        $container.removeClass('kbcb-active-filter');
-                                    }
-
-                                    getLatestRunsInCustomRange(self.thenDate, self.nowDate);
-                                })
                         );
 
                 };
@@ -278,6 +281,16 @@ define([
                 var getLatestRunsInCustomRange = function (fromDate, toDate) {
                     self.thenDate = fromDate;
                     self.nowDate = toDate;
+
+                    var currentTime = ( new Date() ).getTime();
+
+                    if (self.lastRunTime + self.options.rerunDuration * 1000 > currentTime) {
+                      var rows = makeRecentRunsTableRows();
+                      $adminRecentRunsTable.currentPage = 0;
+                      $adminRecentRunsTable.options.updateFunction = self.createDynamicUpdateFunction(adminRecentRunsConfig, rows);
+                      $adminRecentRunsTable.getNewData();
+                      return;
+                    }
 
                     $adminRecentRunsTable.$tBody.empty();
                     $adminRecentRunsTable.$loadingElement.show();
@@ -796,7 +809,9 @@ define([
                 return Promise.try(function () { });
             }
 
-            var seconds = (new Date().getTime() / 1000) - 172800;
+            self.lastRunTime = ( new Date() ).getTime();
+
+            var seconds = (self.lastRunTime / 1000) - 172800;
 
             var now = self.nowDate || (new Date()).getTime();
             var then = self.thenDate || now - self.options.numHours * 60 * 60 * 1000;
