@@ -863,9 +863,11 @@ define([
                         job.result = '<span class="label label-success">Success</span>';
                     }
 
-                    if (job.finish_time) {
+                    if (job.complete) {
                       job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
+
+                    job.result = '<span style="white-space : nowrap">' + job.result + '</span>';
 
                     if (job.narrative_name) {
                       job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
