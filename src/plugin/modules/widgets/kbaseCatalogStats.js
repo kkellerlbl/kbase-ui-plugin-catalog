@@ -863,7 +863,7 @@ define([
                         job.result = '<span class="label label-success">Success</span>';
                     }
 
-                    if (job.finish_time) {
+                    if (job.complete) {
                       job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
