@@ -746,9 +746,9 @@ define([
             return self.checkIsAdmin()
                 .then(function () {
                     if (self.isAdmin) {
-                        return self.getAdminUserStats()
+                        return self.getAdminLatestRuns()
                             .then(function () {
-                                return self.getAdminLatestRuns();
+                                return self.getAdminUserStats();
                             });
                     } else {
                         return Promise.try(function () { });
@@ -871,6 +871,17 @@ define([
 
                     if (job.narrative_name) {
                       job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
+                    }
+
+                    if (job.finish_time) {
+                      job.run_time = job.finish_time - job.exec_start_time;
+                    }
+                    else if (job.modification_time) {
+                      job.run_time = job.modification_time - job.exec_start_time;
+                    }
+
+                    if ( job.complete && ! job.finish_time) {
+                      job.finish_time = job.modification_time;
                     }
 
                     job.queue_time = job.exec_start_time
