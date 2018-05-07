@@ -200,7 +200,7 @@ define([
                     */
                 var filters = {
                     finished: function (row) { return row.complete === true; },
-                    queued: function (row) { return row.exec_start_time === undefined; },
+                    queued: function (row) { return row.exec_start_time === undefined || row.exec_start_time === null; },
                     running: function (row) { return row.complete === false; },
                     success: function (row) { return row.complete === true && row.error !== true; },
                     error: function (row) { return row.complete === true && row.error === true; }
@@ -876,7 +876,7 @@ define([
                     if (job.finish_time) {
                       job.run_time = job.finish_time - job.exec_start_time;
                     }
-                    else if (job.modification_time) {
+                    else if (job.modification_time && job.exec_start_time) {
                       job.run_time = job.modification_time - job.exec_start_time;
                     }
 
