@@ -876,8 +876,8 @@ define([
                     if (job.finish_time) {
                       job.run_time = job.finish_time - job.exec_start_time;
                     }
-                    else if (job.modification_time && job.exec_start_time) {
-                      job.run_time = job.modification_time - job.exec_start_time;
+                    else if (job.exec_start_time) {
+                      job.run_time = Date.now() - job.exec_start_time;
                     }
 
                     if ( job.complete && ! job.finish_time) {
