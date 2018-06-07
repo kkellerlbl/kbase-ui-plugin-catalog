@@ -6,7 +6,13 @@ define([
     'datatables',
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap'
-], function ($, Promise, Workspace, CatalogUtil) {
+], function (
+    $,
+    Promise,
+    Workspace,
+    CatalogUtil
+) {
+    'use strict';
     $.KBWidget({
         name: 'KBaseCatalogTypeBrowser',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -147,7 +153,7 @@ define([
 
 
         populateTypeList: function () {
-            var self = this
+            var self = this;
 
             return self.ws.list_modules({})
                 .then(function (types) {
@@ -156,38 +162,38 @@ define([
                     for (var t = 0; t < types.length; t++) {
                         moduleLookupCalls.push(
                             self.ws.get_module_info({ mod: types[t] })
-                            .then(function (info) {
-                                for (var name in info.types) {
-                                    if (!info.types.hasOwnProperty(name)) continue;
-                                    var tokens = name.split('-');
-                                    var modName = tokens[0].split('.')[0];
-                                    var typeName = tokens[0].split('.')[1];
-                                    var ver = tokens[1]
+                                .then(function (info) {
+                                    for (var name in info.types) {
+                                        if (!info.types.hasOwnProperty(name)) continue;
+                                        var tokens = name.split('-');
+                                        var modName = tokens[0].split('.')[0];
+                                        var typeName = tokens[0].split('.')[1];
+                                        var ver = tokens[1];
 
-                                    var released = '';
-                                    if (info.is_released == 1) { released = 'yes'; }
+                                        var released = '';
+                                        if (info.is_released == 1) { released = 'yes'; }
 
-                                    var owners = '';
-                                    for (var o = 0; o < info.owners.length; o++) {
-                                        if (o >= 1) { owners += ', '; }
-                                        owners += '<a href="#people/' + info.owners[o] + '">' + info.owners[o] + '</a>';
+                                        var owners = '';
+                                        for (var o = 0; o < info.owners.length; o++) {
+                                            if (o >= 1) { owners += ', '; }
+                                            owners += '<a href="#people/' + info.owners[o] + '">' + info.owners[o] + '</a>';
+                                        }
+                                        var typeInfo = {
+                                            'module': modName,
+                                            'type': typeName,
+                                            'type_link': '<a href="#spec/module/' + modName + '">' + modName + '</a>.<a href="#spec/type/' + modName + '.' + typeName + '">' + typeName + '</a>',
+                                            'ver': ver,
+                                            'timestamp': '<!--' + info.ver + '-->' + new Date(info.ver).toLocaleString(),
+                                            'owners_link': owners,
+                                            'released': released
+                                        };
+                                        self.typeList.push(typeInfo);
                                     }
-                                    var typeInfo = {
-                                        'module': modName,
-                                        'type': typeName,
-                                        'type_link': '<a href="#spec/module/' + modName + '">' + modName + '</a>.<a href="#spec/type/' + modName + '.' + typeName + '">' + typeName + '</a>',
-                                        'ver': ver,
-                                        'timestamp': '<!--' + info.ver + '-->' + new Date(info.ver).toLocaleString(),
-                                        'owners_link': owners,
-                                        'released': released
-                                    }
-                                    self.typeList.push(typeInfo);
-                                }
 
-                            })
-                            .catch(function (err) {
-                                console.error(err.error.message);
-                            }));
+                                })
+                                .catch(function (err) {
+                                    console.error(err.error.message);
+                                }));
                     }
                     // when we have it all, then return
                     return Promise.all(moduleLookupCalls);

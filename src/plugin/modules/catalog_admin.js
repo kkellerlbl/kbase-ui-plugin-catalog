@@ -1,10 +1,3 @@
-/*global
- define
- */
-/*jslint
- browser: true,
- white: true
- */
 define([
     'bluebird',
     'kb_common/dom',

@@ -7,8 +7,8 @@ define([
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap'
 ], function (
-    $, 
-    Promise, 
+    $,
+    Promise,
     Catalog,
     CatalogUtil
 ) {

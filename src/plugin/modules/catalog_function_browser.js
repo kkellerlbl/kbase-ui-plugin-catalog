@@ -1,16 +1,14 @@
-/*global
- define
- */
-/*jslint
- browser: true,
- white: true
- */
 define([
     'bluebird',
     'kb_common/dom',
     'kb_common/html',
     'kb_widget/widgetSet'
-], function (Promise, DOM, html, WidgetSet) {
+], function (
+    Promise,
+    DOM,
+    html,
+    WidgetSet
+) {
     'use strict';
     function widget(config) {
         var mount, container, runtime = config.runtime,
@@ -25,7 +23,7 @@ define([
             // the catalog home page is simple the catalog browser
             var div=html.tag('div');
             return div({
-                id: widgetSet.addWidget('catalog_function_browser_widget', 
+                id: widgetSet.addWidget('catalog_function_browser_widget',
                     {
                         jqueryName: 'KBaseCatalogFunctionBrowser',
                         jquery_name:'KBaseCatalogFunctionBrowser'

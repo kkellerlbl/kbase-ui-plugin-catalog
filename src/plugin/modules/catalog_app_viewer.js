@@ -3,8 +3,8 @@ define([
     'kb_common/html',
     'kb_widget/widgetSet'
 ], function (
-    Promise, 
-    html, 
+    Promise,
+    html,
     WidgetSet
 ) {
     'use strict';
@@ -19,9 +19,9 @@ define([
             // the catalog home page is simply the catalog browser
             var div=html.tag('div');
             return div({
-                id: widgetSet.addWidget('catalog_app_viewer_widget', 
+                id: widgetSet.addWidget('catalog_app_viewer_widget',
                     {
-                        jqueryName: 'KBaseCatalogAppViewer', 
+                        jqueryName: 'KBaseCatalogAppViewer',
                         jquery_name:'KBaseCatalogAppViewer'
                     })
             });

@@ -1,10 +1,14 @@
 define([
     'jquery',
     'kb_service/client/catalog',
-    '../catalog_util',
+
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
-], function ($, Catalog, CatalogUtil) {
+], function (
+    $,
+    Catalog
+) {
+    'use strict';
     $.KBWidget({
         name: 'KBaseCatalogIndex',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -52,7 +56,7 @@ define([
                 .append($('<div>').append(descriptionText));
             $m.append('<hr>');
 
-            var descriptionText = 'A brief introduction to KBase apps and the App Catalog.';
+            descriptionText = 'A brief introduction to KBase apps and the App Catalog.';
             $m.append($('<h4>').append(self.makeLink('https://kbase.us/apps', 'App Catalog Help Pages')))
                 .append($('<div>').append(descriptionText));
             $m.append('<hr>');
@@ -65,7 +69,7 @@ define([
             $m.append('<hr>');
 
 
-            descriptionText = '(for developers) Browse and search for functions that you can call from your code.  Think of these functions as your KBase API library that anyone can contribute to.'
+            descriptionText = '(for developers) Browse and search for functions that you can call from your code.  Think of these functions as your KBase API library that anyone can contribute to.';
             $m.append($('<h4>').append(self.makeLink(base + 'functions', 'Function Catalog')))
                 .append($('<div>').append(descriptionText));
             $m.append('<hr>');
@@ -144,7 +148,7 @@ define([
             );
         },
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
 
             var $adminLinks = $('<div>');
@@ -157,7 +161,7 @@ define([
         },
 
         checkIsAdmin: function () {
-            var self = this
+            var self = this;
             var me = self.runtime.service('session').getUsername();
             return self.catalog.is_admin(me)
                 .then(function (result) {

@@ -1,20 +1,18 @@
 define([
-    'bluebird',
-    'jquery',
-    'kb_common/dom',
-    'kb_common/html',
-    'kb_widget/widgetSet'
-], function(Promise, $, DOM, html, WidgetSet) {
+    'jquery'
+], function(
+    $
+) {
     'use strict';
 
     // favorites callback should accept:
-    //  
+    //
     //  favoritesCallback(this.info)
-    //    info = 
+    //    info =
     //      id:
     //      module_name:
     //      ...
-    //     
+    //
     //function FunctionCard(type, info, tag, nms_base_url, favoritesCallback, favoritesCallbackParams, isLoggedIn) {
 
 
@@ -198,7 +196,7 @@ define([
 
 
             // SUBTITLE - on mouseover of info, show subtitle information
-            var $subtitle = $('<div>').addClass('kbcb-app-card-subtitle').append(info.short_description).hide()
+            var $subtitle = $('<div>').addClass('kbcb-app-card-subtitle').append(info.short_description).hide();
             $appDiv.append($subtitle);
 
             // FOOTER - stars, number of runs, and info mouseover area

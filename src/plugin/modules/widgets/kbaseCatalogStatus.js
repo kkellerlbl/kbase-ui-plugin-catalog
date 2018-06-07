@@ -83,11 +83,11 @@ define([
         },
 
         renderError: function () {
-            var self = this
-            self.$basicStatusDiv.empty()
+            var self = this;
+            self.$basicStatusDiv.empty();
             self.$basicStatusDiv.append(
                 $('<div role=alert>').addClass('alert alert-danger')
-                .append('<b>Error contacting the catalog.  The catalog may be down.</b>'))
+                    .append('<b>Error contacting the catalog.  The catalog may be down.</b>'));
         },
 
         render: function () {
@@ -106,7 +106,7 @@ define([
             );
         },
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
 
             $mainPanel.append($('<div>').addClass('kbcb-back-link')
@@ -208,17 +208,17 @@ define([
                     modules = [$filterModules.val()];
                 }
                 self.getBuildStatus(
-                        self.options.skip,
-                        $setLimit.val(),
-                        modules)
+                    self.options.skip,
+                    $setLimit.val(),
+                    modules)
                     .then(
                         function () { self.renderBuildList(); }
                     );
             });
             var $filterModulesDiv =
                 $('<div>').addClass('form-group')
-                .append($('<label for="filter_modules">').append('Filter by Module'))
-                .append($filterModules);
+                    .append($('<label for="filter_modules">').append('Filter by Module'))
+                    .append($filterModules);
 
 
 
@@ -228,9 +228,9 @@ define([
                     modules = [$filterModules.val()];
                 }
                 self.getBuildStatus(
-                        self.options.skip,
-                        $setLimit.val(),
-                        modules)
+                    self.options.skip,
+                    $setLimit.val(),
+                    modules)
                     .then(
                         function () { self.renderBuildList(); }
                     );
@@ -238,8 +238,8 @@ define([
 
             var $setLimitDiv =
                 $('<div>').addClass('form-group')
-                .append($('<label for="filter_modules">').append('Showing:'))
-                .append($setLimit);
+                    .append($('<label for="filter_modules">').append('Showing:'))
+                    .append($setLimit);
 
 
             var $refreshBtn = $('<button>').addClass('btn btn-default')
@@ -327,10 +327,6 @@ define([
         getCatalogVersion: function () {
             var self = this;
 
-            var moduleSelection = {
-                module_name: self.module_name
-            };
-
             return self.catalog.version()
                 .then(function (version) {
                     self.catalog_version = version;
@@ -397,8 +393,8 @@ define([
             var self = this;
 
             return self.catalog.list_basic_module_info({
-                    include_unreleased: 1
-                })
+                include_unreleased: 1
+            })
                 .then(function (module_list) {
                     var good_modules = [];
                     for (var k = 0; k < module_list.length; k++) {
@@ -422,7 +418,6 @@ define([
                     console.error(err);
                 });
         },
-
 
         showError: function (error) {
             this.$errorPanel.empty();

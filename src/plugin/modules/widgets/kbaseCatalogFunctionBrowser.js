@@ -1,12 +1,21 @@
 define([
+    'bluebird',
     'jquery',
-    'kb_service/client/narrativeMethodStore',
     'kb_service/client/catalog',
     '../catalog_util',
     '../function_card',
+
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
-], function ($, NarrativeMethodStore, Catalog, CatalogUtil, FunctionCard) {
+], function (
+    Promise,
+    $,
+    Catalog,
+    CatalogUtil,
+    FunctionCard
+) {
+    'use strict';
+
     $.KBWidget({
         name: 'kbaseCatalogFunctionBrowser',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -19,16 +28,12 @@ define([
         // clients to the catalog service and the NarrativeMethodStore
         catalog: null,
 
-
-
         // control panel and elements
         $controlToolbar: null,
         $searchBox: null,
 
         // main panel and elements
-        $mainPanel: null,
         $functionListPanel: null,
-
 
         functionList: null,
 
@@ -82,7 +87,7 @@ define([
             if (self.options.tag) {
                 self.tag = self.options.tag;
                 if (self.tag !== 'dev' && self.tag !== 'beta' && self.tag !== 'release') {
-                    console.warn('tag ' + tag + ' is not valid! Use: dev/beta/release.  defaulting to release.');
+                    console.warn('tag ' + self.tag + ' is not valid! Use: dev/beta/release.  defaulting to release.');
                     self.tag = 'release';
                 }
                 self.switchVersion(self.tag);
@@ -118,9 +123,9 @@ define([
             // SEARCH
             var $searchBox = $('<input type="text" placeholder="Search" size="50">').addClass('form-control');
             $searchBox.on('input',
-                    function () {
-                        self.filterFunctions($searchBox.val());
-                    })
+                function () {
+                    self.filterFunctions($searchBox.val());
+                })
                 .bind('keypress', function (e) {
                     if (e.keyCode === 13) {
                         return false;
@@ -135,7 +140,7 @@ define([
             $content.append($ctrList);
 
             // ORGANIZE BY
-            var $obMyFavs = $('<a>');
+            // var $obMyFavs = $('<a>');
 
             //var $obRuns = $('<a>').append('Run Count')
             //                    .on('click', function() {self.renderAppList('runs')});
@@ -176,7 +181,7 @@ define([
                 });
 
             var $organizeBy = $('<li>').addClass('dropdown')
-                .append('<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Organize by <span class="caret"></span></a>')
+                .append('<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Organize by <span class="caret"></span></a>');
 
             $organizeBy
                 .append($('<ul>').addClass('dropdown-menu')
@@ -198,14 +203,14 @@ define([
                         .append($obOutput)));
 
             var $verR = $('<a>').append('Latest Release')
-                .on('click', function () { self.switchVersion('release') });
+                .on('click', function () { self.switchVersion('release'); });
             var $verB = $('<a>').append('Beta Versions')
-                .on('click', function () { self.switchVersion('beta') });
+                .on('click', function () { self.switchVersion('beta'); });
             var $verD = $('<a>').append('Development Versions')
-                .on('click', function () { self.switchVersion('dev') });
+                .on('click', function () { self.switchVersion('dev'); });
 
             var $version = $('<li>').addClass('dropdown')
-                .append('<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Version<span class="caret"></span></a>')
+                .append('<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Version<span class="caret"></span></a>');
 
             $version
                 .append($('<ul>').addClass('dropdown-menu')
@@ -235,7 +240,7 @@ define([
                     .append($indexLink)
                     .append($helpLink));
 
-            $nav.append($container)
+            $nav.append($container);
 
             return [$nav, $searchBox];
         },
@@ -359,7 +364,7 @@ define([
         },
 
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
             var $functionListPanel = $('<div>');
             $mainPanel.append($functionListPanel);
@@ -380,7 +385,7 @@ define([
 
         refreshLocalFunctionList: function (tag) {
 
-            var self = this
+            var self = this;
 
             var localFunctionSelection = {
                 release_tag: tag
@@ -507,13 +512,13 @@ define([
                 // INPUT TYPE PARSE
                 if (self.functionList[k].info.tags.input.file_types.length > 0) {
                     var input_types = self.functionList[k].info.tags.input.file_types;
-                    for (var i = 0; i < input_types.length; i++) {
+                    for (i = 0; i < input_types.length; i++) {
                         self.inputTypes['File: ' + input_types[i]] = 1;
                     }
                 }
                 if (self.functionList[k].info.tags.input.kb_types.length > 0) {
-                    var input_types = self.functionList[k].info.tags.input.kb_types;
-                    for (var i = 0; i < input_types.length; i++) {
+                    input_types = self.functionList[k].info.tags.input.kb_types;
+                    for (i = 0; i < input_types.length; i++) {
                         self.inputTypes['KBase Type: ' + input_types[i]] = 1;
                     }
                 }
@@ -521,13 +526,13 @@ define([
                 // OUTPUT TYPE PARSE
                 if (self.functionList[k].info.tags.output.file_types.length > 0) {
                     var output_types = self.functionList[k].info.tags.output.file_types;
-                    for (var i = 0; i < output_types.length; i++) {
+                    for (i = 0; i < output_types.length; i++) {
                         self.outputTypes['File: ' + output_types[i]] = 1;
                     }
                 }
                 if (self.functionList[k].info.tags.output.kb_types.length > 0) {
-                    var output_types = self.functionList[k].info.tags.output.kb_types;
-                    for (var i = 0; i < output_types.length; i++) {
+                    output_types = self.functionList[k].info.tags.output.kb_types;
+                    for (i = 0; i < output_types.length; i++) {
                         self.outputTypes['KBase Type: ' + output_types[i]] = 1;
                     }
                 }
@@ -543,7 +548,7 @@ define([
             self.$functionListPanel.children().detach();
 
             if (self.tag) {
-                var text_css = { 'color': '#777', 'font-size': '1.1em', 'margin': '5px' }
+                var text_css = { 'color': '#777', 'font-size': '1.1em', 'margin': '5px' };
                 if (self.tag == 'dev') {
                     self.$functionListPanel.append($('<div>').css(text_css).append('Currently viewing Functions under development.'));
                 } else if (self.tag == 'beta') {
@@ -569,7 +574,7 @@ define([
                     if (a.info.name.toLowerCase() > b.info.name.toLowerCase()) return 1;
                     return 0;
                 });
-                var $listContainer = $('<div>').css({ 'overflow': 'auto', 'padding': '0 0 2em 0' });
+                $listContainer = $('<div>').css({ 'overflow': 'auto', 'padding': '0 0 2em 0' });
                 for (var k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
                     $listContainer.append(self.functionList[k].getNewCardDiv());
@@ -582,8 +587,8 @@ define([
                     if (a.info.name.toLowerCase() > b.info.name.toLowerCase()) return -1;
                     return 0;
                 });
-                var $listContainer = $('<div>').css({ 'overflow': 'auto', 'padding': '0 0 2em 0' });
-                for (var k = 0; k < self.functionList.length; k++) {
+                $listContainer = $('<div>').css({ 'overflow': 'auto', 'padding': '0 0 2em 0' });
+                for (k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
                     $listContainer.append(self.functionList[k].getNewCardDiv());
                 }
@@ -605,7 +610,7 @@ define([
                 });
                 var currentModuleName = '';
                 var $currentModuleDiv = null;
-                for (var k = 0; k < self.functionList.length; k++) {
+                for (let k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
 
                     var info = self.functionList[k].info;
@@ -627,31 +632,31 @@ define([
 
                 // get and sort the dev list
                 var devs = [];
-                for (var k in self.developers) { devs.push(k); }
+                for (k in self.developers) { devs.push(k); }
                 devs.sort();
 
                 // create the sections per author
                 var $authorDivLookup = {};
-                for (var k = 0; k < devs.length; k++) {
-                    var $section = $('<div>').addClass('catalog-section');
+                for (k = 0; k < devs.length; k++) {
+                    $section = $('<div>').addClass('catalog-section');
                     var $authorDiv = $('<div>').addClass('kbcb-app-card-list-container');
                     $authorDivLookup[devs[k]] = $authorDiv;
                     $section.append(
                         $('<div>').css({ 'color': '#777' })
-                        .append($('<h4>').append('<a href="#people/' + devs[k] + '">' + devs[k] + '</a>')));
-                    $section.append($authorDiv)
+                            .append($('<h4>').append('<a href="#people/' + devs[k] + '">' + devs[k] + '</a>')));
+                    $section.append($authorDiv);
                     self.$functionListPanel.append($section);
                 }
-                var $section = $('<div>').addClass('catalog-section');
+                $section = $('<div>').addClass('catalog-section');
                 var $noAuthorDiv = $('<div>').addClass('kbcb-app-card-list-container');
                 $section.append(
                     $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append('No Developer Specified')));
+                        .append($('<h4>').append('No Developer Specified')));
                 $section.append($noAuthorDiv);
                 self.$functionListPanel.append($section);
 
                 // render the app list
-                for (var k = 0; k < self.functionList.length; k++) {
+                for (let k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
 
                     if (self.functionList[k].info.authors.length > 0) {
@@ -660,42 +665,42 @@ define([
                             $authorDivLookup[authors[i]].append(self.functionList[k].getNewCardDiv());
                         }
                     } else {
-                        $noAuthorDiv.append(self.functionList[k].getNewCardDiv())
+                        $noAuthorDiv.append(self.functionList[k].getNewCardDiv());
                     }
                 }
 
             } else if (organizeBy == 'category') {
 
                 var cats = [];
-                for (var k in self.categories) { cats.push(k); }
+                for (k in self.categories) { cats.push(k); }
                 cats.sort();
 
-                var $catDivLookup = {}
-                for (var k = 0; k < cats.length; k++) {
-                    var $section = $('<div>').addClass('catalog-section');
-                    var $catDiv = $('<div>').addClass('kbcb-app-card-list-container');
+                var $catDivLookup = {};
+                for (let k = 0; k < cats.length; k++) {
+                    let $section = $('<div>').addClass('catalog-section');
+                    let $catDiv = $('<div>').addClass('kbcb-app-card-list-container');
                     $catDivLookup[cats[k]] = $catDiv;
                     $section.append(
                         $('<div>').css({ 'color': '#777' })
-                        .append($('<h4>').append(self.categories[cats[k]])));
-                    $section.append($catDiv)
+                            .append($('<h4>').append(self.categories[cats[k]])));
+                    $section.append($catDiv);
                     self.$functionListPanel.append($section);
                 }
-                var $section = $('<div>').addClass('catalog-section');
-                var $noCatDiv = $('<div>').addClass('kbcb-app-card-list-container');
+                let $section = $('<div>').addClass('catalog-section');
+                let $noCatDiv = $('<div>').addClass('kbcb-app-card-list-container');
                 $section.append(
                     $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append('Uncategorized')));
+                        .append($('<h4>').append('Uncategorized')));
                 $section.append($noCatDiv);
                 self.$functionListPanel.append($section);
 
-                for (var k = 0; k < self.functionList.length; k++) {
+                for (let k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
 
                     if (self.functionList[k].info.tags.categories.length > 0) {
                         var appCats = self.functionList[k].info.tags.categories;
                         var gotCat = false;
-                        for (var i = 0; i < appCats.length; i++) {
+                        for (let i = 0; i < appCats.length; i++) {
                             if ($catDivLookup.hasOwnProperty(appCats[i])) {
                                 gotCat = true;
                                 $catDivLookup[appCats[i]].append(self.functionList[k].getNewCardDiv());
@@ -738,73 +743,73 @@ define([
             else if (organizeBy == 'input_types') {
                 // get and sort the type list
                 var types = [];
-                for (var k in self.inputTypes) { types.push(k); }
+                for (let k in self.inputTypes) { types.push(k); }
                 types.sort();
 
                 // create the sections per author
                 var $typeDivLookup = {};
-                for (var k = 0; k < types.length; k++) {
-                    var $section = $('<div>').addClass('catalog-section');
+                for (let k = 0; k < types.length; k++) {
+                    let $section = $('<div>').addClass('catalog-section');
                     var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
                     $typeDivLookup[types[k]] = $typeDiv;
                     $section.append(
                         $('<div>').css({ 'color': '#777' })
-                        .append($('<h4>').append(types[k])));
-                    $section.append($typeDiv)
+                            .append($('<h4>').append(types[k])));
+                    $section.append($typeDiv);
                     self.$functionListPanel.append($section);
                 }
 
                 // render the app list
-                for (var k = 0; k < self.functionList.length; k++) {
+                for (let k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
 
                     if (self.functionList[k].info.tags.input.file_types.length > 0) {
                         var input_types = self.functionList[k].info.tags.input.file_types;
-                        for (var i = 0; i < input_types.length; i++) {
+                        for (let i = 0; i < input_types.length; i++) {
                             $typeDivLookup['File: ' + input_types[i]].append(self.functionList[k].getNewCardDiv());
                         }
                     }
 
                     if (self.functionList[k].info.tags.input.kb_types.length > 0) {
-                        var input_types = self.functionList[k].info.tags.input.kb_types;
-                        for (var i = 0; i < input_types.length; i++) {
+                        let input_types = self.functionList[k].info.tags.input.kb_types;
+                        for (let i = 0; i < input_types.length; i++) {
                             $typeDivLookup['KBase Type: ' + input_types[i]].append(self.functionList[k].getNewCardDiv());
                         }
                     }
                 }
             } else if (organizeBy == 'output_types') {
                 // get and sort the type list
-                var types = [];
-                for (var k in self.outputTypes) { types.push(k); }
+                let types = [];
+                for (let k in self.outputTypes) { types.push(k); }
                 types.sort();
 
                 // create the sections per author
-                var $typeDivLookup = {};
-                for (var k = 0; k < types.length; k++) {
-                    var $section = $('<div>').addClass('catalog-section');
-                    var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
+                let $typeDivLookup = {};
+                for (let k = 0; k < types.length; k++) {
+                    let $section = $('<div>').addClass('catalog-section');
+                    let $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
                     $typeDivLookup[types[k]] = $typeDiv;
                     $section.append(
                         $('<div>').css({ 'color': '#777' })
-                        .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
-                    $section.append($typeDiv)
+                            .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
+                    $section.append($typeDiv);
                     self.$functionListPanel.append($section);
                 }
 
                 // render the app list
-                for (var k = 0; k < self.functionList.length; k++) {
+                for (let k = 0; k < self.functionList.length; k++) {
                     self.functionList[k].clearCardsAddedCount();
 
                     if (self.functionList[k].info.tags.output.file_types.length > 0) {
                         var output_types = self.functionList[k].info.tags.output.file_types;
-                        for (var i = 0; i < output_types.length; i++) {
+                        for (let i = 0; i < output_types.length; i++) {
                             $typeDivLookup['File: ' + output_types[i]].append(self.functionList[k].getNewCardDiv());
                         }
                     }
 
                     if (self.functionList[k].info.tags.output.kb_types.length > 0) {
-                        var output_types = self.functionList[k].info.tags.output.kb_types;
-                        for (var i = 0; i < output_types.length; i++) {
+                        let output_types = self.functionList[k].info.tags.output.kb_types;
+                        for (let i = 0; i < output_types.length; i++) {
                             $typeDivLookup['KBase Type: ' + output_types[i]].append(self.functionList[k].getNewCardDiv());
                         }
                     }

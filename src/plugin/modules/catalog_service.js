@@ -1,10 +1,3 @@
-/*global
- define
- */
-/*jslint
- browser: true,
- white: true
- */
 define([
     'bluebird',
     'kb_common/dom',
@@ -24,9 +17,9 @@ define([
             // the catalog home page is simple the catalog browser
             var div=html.tag('div');
             return div({
-                id: widgetSet.addWidget('catalog_service_widget', 
+                id: widgetSet.addWidget('catalog_service_widget',
                     {
-                        jqueryName: 'KBaseCatalogService', 
+                        jqueryName: 'KBaseCatalogService',
                         jquery_name:'KBaseCatalogService'
                     })
             });

@@ -4,9 +4,9 @@ define([
     'kb_common/html',
     'kb_widget/widgetSet'
 ], function (
-    Promise, 
-    DOM, 
-    html, 
+    Promise,
+    DOM,
+    html,
     WidgetSet
 ) {
     'use strict';
@@ -19,9 +19,9 @@ define([
 
         function render() {
             return div({
-                id: widgetSet.addWidget('catalog_module_viewer_widget', 
+                id: widgetSet.addWidget('catalog_module_viewer_widget',
                     {
-                        jqueryName: 'KBaseCatalogModuleViewer', 
+                        jqueryName: 'KBaseCatalogModuleViewer',
                         jquery_name:'KBaseCatalogModuleViewer'
                     })
             });

@@ -1,12 +1,12 @@
 define([
     'jquery',
     'bluebird',
-    'kb_service/client/narrativeMethodStore',
     'kb_service/client/catalog',
     'kb_service/client/narrativeJobService',
     '../catalog_util',
     'kb_common/dynamicTable',
     'kb_common/jsonRpc/dynamicServiceClient',
+
     'datatables',
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
@@ -14,21 +14,13 @@ define([
 ], function (
     $,
     Promise,
-    NarrativeMethodStore,
     Catalog,
     NarrativeJobService,
     CatalogUtil,
     DynamicTable,
     DynamicService
 ) {
-
-    function renderDate(date, type, full) {
-        if (type == 'display') {
-            date = new Date(date * 1000).toLocaleString();
-        }
-        return date;
-    }
-
+    'use strict';
     return $.KBWidget({
         name: 'KBaseCatalogStats',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -282,14 +274,12 @@ define([
                     self.thenDate = fromDate;
                     self.nowDate = toDate;
 
-                    var currentTime = ( new Date() ).getTime();
-
                     if (cached && self.lastRunTime) {
-                      var rows = makeRecentRunsTableRows();
-                      $adminRecentRunsTable.currentPage = 0;
-                      $adminRecentRunsTable.options.updateFunction = self.createDynamicUpdateFunction(adminRecentRunsConfig, rows);
-                      $adminRecentRunsTable.getNewData();
-                      return;
+                        var rows = makeRecentRunsTableRows();
+                        $adminRecentRunsTable.currentPage = 0;
+                        $adminRecentRunsTable.options.updateFunction = self.createDynamicUpdateFunction(adminRecentRunsConfig, rows);
+                        $adminRecentRunsTable.getNewData();
+                        return;
                     }
 
                     $adminRecentRunsTable.$tBody.empty();
@@ -352,14 +342,14 @@ define([
                                     .append($.jqElem('option').attr('value', 24 * 7).append('Last week'))
                                     .append($.jqElem('option').attr('value', 24 * 30).append('Last month'))
                                     .append($.jqElem('option').attr('value', 'custom').append('Custom Range'))
-                                    .on('change', function(e) { refreshInTimeRange($(e.currentTarget), $(e.currentTarget).next().next()) })
+                                    .on('change', function(e) { refreshInTimeRange($(e.currentTarget), $(e.currentTarget).next().next()); })
                             )
                             .append(
-                              $.jqElem('button')
-                                .addClass('btn btn-default')
-                                .on('click', function(e) { refreshInTimeRange($(e.currentTarget).prev(), $(e.currentTarget).next()) })
-                                .attr('title', 'Refresh jobs data')
-                                .append($.jqElem('i').addClass('fa fa-refresh'))
+                                $.jqElem('button')
+                                    .addClass('btn btn-default')
+                                    .on('click', function(e) { refreshInTimeRange($(e.currentTarget).prev(), $(e.currentTarget).next()); })
+                                    .attr('title', 'Refresh jobs data')
+                                    .append($.jqElem('i').addClass('fa fa-refresh'))
                             )
                             .append(
                             /* And this div contains the range input boxes, which are hidden below the selectbox until
@@ -475,7 +465,7 @@ define([
 
                                    If you click on the button and already have a job-log row next, it'll remove it instead.
                                 */
-                            $jobLogButton.on('click', function (e) {
+                            $jobLogButton.on('click', function () {
                                 if ($row.next().data('job-log')) {
                                     $row.next().remove();
                                 }
@@ -511,7 +501,7 @@ define([
 
                 var adminUserStatsRestructuredRows = self.restructureRows(adminUserStatsConfig, self.adminStats);
 
-                var $adminUserStatsTable = new DynamicTable($adminUserStatsContainer,
+                new DynamicTable($adminUserStatsContainer,
                     {
                         headers: adminUserStatsConfig.headers,
                         rowsPerPage: adminUserStatsConfig.rowsPerPage,
@@ -519,10 +509,10 @@ define([
                         updateFunction: self.createDynamicUpdateFunction(adminUserStatsConfig, adminUserStatsRestructuredRows)
                     }
                 );
-                    // done prep the container + data for admin recent runs stats
+                // done prep the container + data for admin recent runs stats
 
-                    // we need to update the length of time that displays in the section header. Note that this is
-                    // somewhat manually wired and may deviate from what's in the select box. A more clever solution would be handy.
+                // we need to update the length of time that displays in the section header. Note that this is
+                // somewhat manually wired and may deviate from what's in the select box. A more clever solution would be handy.
                 self.numHoursField = $('<span>').text('last ' + self.options.numHours + ' hours');
                 var $adminContainer = $('<div>').addClass('container-fluid');
 
@@ -577,7 +567,7 @@ define([
 
             var basicStatsRestructuredRows = self.restructureRows(basicStatsConfig, self.allStats);
 
-            var $basicStatsTable = new DynamicTable($basicStatsContainer,
+            new DynamicTable($basicStatsContainer,
                 {
                     headers: basicStatsConfig.headers,
                     rowsPerPage: basicStatsConfig.rowsPerPage,
@@ -593,7 +583,7 @@ define([
                     }
                 }
             );
-                // done prep the container + id for basic stats
+            // done prep the container + id for basic stats
 
             var $container = $('<div>').addClass('container-fluid')
                 .append($('<div>').addClass('row')
@@ -621,8 +611,8 @@ define([
                 .then(function (logs) {
                     $log.empty();
                     $log.append(
-                      $('<div>')
-                        .append('Log for job id <b>' + jobId + '</b><hr>')
+                        $('<div>')
+                            .append('Log for job id <b>' + jobId + '</b><hr>')
                     );
                     for (var i = 0; i < logs.lines.length; i++) {
                         $log.append(logLine(i, logs.lines[i].line, logs.lines[i].is_error));
@@ -649,7 +639,7 @@ define([
 
         },
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
 
             $mainPanel.append($('<div>').addClass('kbcb-back-link')
@@ -820,8 +810,6 @@ define([
 
             self.lastRunTime = ( new Date() ).getTime();
 
-            var seconds = (self.lastRunTime / 1000) - 172800;
-
             var now = self.nowDate || (new Date()).getTime();
             var then = self.thenDate || now - self.options.numHours * 60 * 60 * 1000;
 
@@ -830,9 +818,7 @@ define([
             return self.metricsClient.callFunc('get_app_metrics', [{ epoch_range: [then, now], user_ids: self.options.usernames }]).then(function (data) {
                 var jobs = data[0].job_states;
 
-                jobs.forEach(function (job, idx) {
-
-
+                jobs.forEach(function (job) {
                     // various tidying up and re-formatting of the results which came back from the service.
                     job.user_id = '<a href="#people/' + job.user + '" target="_blank">' + job.user + '</a>';
 
@@ -864,32 +850,32 @@ define([
                     }
 
                     if (job.complete) {
-                      job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
+                        job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
                     job.result = '<span style="white-space : nowrap">' + job.result + '</span>';
 
                     if (job.narrative_name) {
-                      job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
+                        job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
                     }
 
                     if (job.finish_time) {
-                      job.run_time = job.finish_time - job.exec_start_time;
+                        job.run_time = job.finish_time - job.exec_start_time;
                     }
                     else if (job.exec_start_time) {
-                      job.run_time = Date.now() - job.exec_start_time;
+                        job.run_time = Date.now() - job.exec_start_time;
                     }
 
                     if ( job.complete && ! job.finish_time) {
-                      job.finish_time = job.modification_time;
+                        job.finish_time = job.modification_time;
                     }
 
                     job.queue_time = job.exec_start_time
-                      ? job.exec_start_time - job.creation_time
-                      : 0;
+                        ? job.exec_start_time - job.creation_time
+                        : 0;
 
                     if (job.client_groups) {
-                      job.client_groups = job.client_groups.join(',');
+                        job.client_groups = job.client_groups.join(',');
                     }
 
                     self.adminRecentRuns.push(job);
@@ -917,7 +903,7 @@ define([
                     */
             })
                 .catch(function (xhr) {
-                    console.log('FAILED : ', [xhr.type, xhr.message].join(':'));
+                    console.error('FAILED : ', [xhr.type, xhr.message].join(':'));
                 });//*/
 
         },

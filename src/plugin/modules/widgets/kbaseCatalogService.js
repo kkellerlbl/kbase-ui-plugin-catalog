@@ -9,7 +9,15 @@ define([
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
     'datatables_bootstrap'
-], function ($, Promise, NarrativeMethodStore, Catalog, ServiceWizard, CatalogUtil) {
+], function (
+    $,
+    Promise,
+    NarrativeMethodStore,
+    Catalog,
+    ServiceWizard,
+    CatalogUtil
+) {
+    'use strict';
     $.KBWidget({
         name: 'KBaseCatalogService',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -87,13 +95,13 @@ define([
                 self.all_versions[k] = self.processEntry(self.all_versions[k]);
             }
 
-            for (var k = 0; k < self.dev_versions.length; k++) {
+            for (let k = 0; k < self.dev_versions.length; k++) {
                 self.dev_versions[k] = self.processEntry(self.dev_versions[k]);
             }
-            for (var k = 0; k < self.beta_versions.length; k++) {
+            for (let k = 0; k < self.beta_versions.length; k++) {
                 self.beta_versions[k] = self.processEntry(self.beta_versions[k]);
             }
-            for (var k = 0; k < self.release_versions.length; k++) {
+            for (let k = 0; k < self.release_versions.length; k++) {
                 self.release_versions[k] = self.processEntry(self.release_versions[k]);
             }
 
@@ -128,7 +136,7 @@ define([
 
             var sDom = 'iftp';
             if (data.length < 100) {
-                sDom = 'ift'
+                sDom = 'ift';
             }
 
             var $table = $('<table>').addClass('table').css('width', '100%');
@@ -161,11 +169,11 @@ define([
                     {
                         sTitle: 'Actions',
                         bSortable: false,
-                        mRender: function (data, type, full) { return ''; }
+                        mRender: function () { return ''; }
                     }
                 ],
                 'data': data,
-                'fnCreatedRow': function (nRow, aData, iDataIndex) {
+                'fnCreatedRow': function (nRow, aData) {
 
                     if (!aData['module_name'].startsWith('!')) {
                         $('td:eq(0)', nRow).html('<a href="#catalog/modules/' + aData['module_name'] + '">' + aData['module_name'] + '</a>');
@@ -218,7 +226,7 @@ define([
             self.status_data = [];
             self.$serviceStatusDiv.empty();
             self.getServiceStatus().then(function () {
-                self.renderServiceStatusList(self.status_data)
+                self.renderServiceStatusList(self.status_data);
             });
         },
 
@@ -228,7 +236,7 @@ define([
 
             var sDom = 'iftp';
             if (data.length < 100) {
-                sDom = 'ift'
+                sDom = 'ift';
             }
 
             var $table = $('<table>').addClass('table').css('width', '100%');
@@ -254,11 +262,11 @@ define([
                     {
                         sTitle: 'Actions',
                         bSortable: false,
-                        mRender: function (data, type, full) { return ''; }
+                        mRender: function () { return ''; }
                     }
                 ],
                 'data': data,
-                'fnCreatedRow': function (nRow, aData, iDataIndex) {
+                'fnCreatedRow': function (nRow, aData) {
                     var $startBtn = $('<button>').addClass('btn btn-success').append('start')
                         .on('click', function () {
                             self.start(aData, this);
@@ -295,16 +303,16 @@ define([
 
         start: function (data, btn) {
             if (data['hash']) {
-                data['git_commit_hash'] = data['hash']
+                data['git_commit_hash'] = data['hash'];
             }
             $(btn).prop('disabled', true);
             $(btn).text('starting...');
 
             var self = this;
             return self.wizard.start({
-                    'module_name': data['module_name'],
-                    'version': data['git_commit_hash']
-                })
+                'module_name': data['module_name'],
+                'version': data['git_commit_hash']
+            })
                 .then(function () {
                     $(btn).text('done.');
                 })
@@ -317,15 +325,15 @@ define([
 
         stop: function (data, btn) {
             if (data['hash']) {
-                data['git_commit_hash'] = data['hash']
+                data['git_commit_hash'] = data['hash'];
             }
             $(btn).prop('disabled', true);
             $(btn).text('stopping...');
             var self = this;
             return self.wizard.stop({
-                    'module_name': data['module_name'],
-                    'version': data['git_commit_hash']
-                })
+                'module_name': data['module_name'],
+                'version': data['git_commit_hash']
+            })
                 .then(function () {
                     $(btn).text('done.');
                 })
@@ -337,8 +345,7 @@ define([
         },
 
         escapeHtml: function (text) {
-            'use strict';
-            return text.replace(/[\"&<>]/g, function (a) {
+            return text.replace(/["&<>]/g, function (a) {
                 return { '"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;' }[a];
             });
         },
@@ -348,20 +355,21 @@ define([
         showLog: function (data, btn) {
             var self = this;
             self.$logPanelDiv.empty();
-            self.$logPanelDiv.append($('<h3>').append('Service Log:'))
+            self.$logPanelDiv.append($('<h3>').append('Service Log:'));
             var $container = $('<div>');
             $container.append($('<i>').addClass('fa fa-spinner fa-2x fa-spin')).append('<br><br><br>');
             self.$logPanelDiv.append($container);
 
             /* don't use websockets to rancher for now */
-            if (false) { //'WebSocket' in window){
+            let useWebsockets = false;
+            if (useWebsockets) { //'WebSocket' in window){
                 /* WebSocket is supported. great! */
                 return self.wizard.get_service_log_web_socket({
-                        service: {
-                            'module_name': data['module_name'],
-                            'version': data['git_commit_hash']
-                        }
-                    })
+                    service: {
+                        'module_name': data['module_name'],
+                        'version': data['git_commit_hash']
+                    }
+                })
                     .then(function (logdata) {
                         $container.empty();
 
@@ -393,26 +401,30 @@ define([
 
                             // create the connections
                             var connection = new WebSocket(logdata[k]['socket_url']);
-                            var onclose = function (id) {
-                                return function () { console.log('closing ' + id) };
-                            }
-                            var onopen = function (id) {
-                                return function () { console.log('opening ' + id) };
-                            }
-                            var onmessage = function ($logPanel, escapeHtml) {
+                            var onclose = function () {
+                                return function () {
+                                    // console.warn('closing ' + id);
+                                };
+                            };
+                            var onopen = function () {
+                                return function () {
+                                    // console.warn('opening ' + id);
+                                };
+                            };
+                            var onmessage = function ($logPanel) {
                                 return function (e) {
                                     var server_mssg = e.data;
-                                    var clean_mssg = server_mssg.replace(/[\"&<>]/g, function (a) {
+                                    var clean_mssg = server_mssg.replace(/["&<>]/g, function (a) {
                                         return { '"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;' }[a];
                                     });
                                     $logPanel.append(clean_mssg).append('<br>');
                                     $logPanel.scrollTop($content[0].scrollHeight);
-                                }
-                            }
+                                };
+                            };
 
-                            connection.onopen = onopen(logdata[k]['instance_id'])
-                            connection.onclose = onclose(logdata[k]['instance_id'])
-                            connection.onmessage = onmessage($content)
+                            connection.onopen = onopen(logdata[k]['instance_id']);
+                            connection.onclose = onclose(logdata[k]['instance_id']);
+                            connection.onmessage = onmessage($content);
                             self.connections.push(connection);
                         }
 
@@ -425,9 +437,9 @@ define([
                         var msg = err.error.message;
                         $container.append(
                             $('<div class="alert alert-danger" role="alert">')
-                            .append('<strong>Error:</strong><br><br>')
-                            .append(msg)
-                        )
+                                .append('<strong>Error:</strong><br><br>')
+                                .append(msg)
+                        );
                         $container.append('<br><br>');
                     });
 
@@ -436,11 +448,11 @@ define([
             } else {
                 /*WebSockets are not supported. */
                 return self.wizard.get_service_log({
-                        service: {
-                            'module_name': data['module_name'],
-                            'version': data['git_commit_hash']
-                        }
-                    })
+                    service: {
+                        'module_name': data['module_name'],
+                        'version': data['git_commit_hash']
+                    }
+                })
                     .then(function (logdata) {
                         $container.empty();
                         var $logs = $('<div>');
@@ -479,19 +491,13 @@ define([
                         var msg = err.error.message;
                         $container.append(
                             $('<div class="alert alert-danger" role="alert">')
-                            .append('<strong>Error:</strong><br><br>')
-                            .append(msg)
-                        )
+                                .append('<strong>Error:</strong><br><br>')
+                                .append(msg)
+                        );
                         $container.append('<br><br>');
                     });
             }
-
-
-
-
-
         },
-
 
         setupClients: function () {
             this.catalog = new Catalog(
@@ -505,7 +511,7 @@ define([
             );
         },
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var self = this;
             var $mainPanel = $('<div>').addClass('container-fluid');
 
@@ -518,7 +524,7 @@ define([
             var $statusRefresh = $('<button>').addClass('btn btn-default')
                 .append($('<i class="fa fa-refresh" aria-hidden="true">'))
                 .append('&nbsp;&nbspRefresh');
-            $statusRefresh.on('click', function () { self.refreshServiceStatus(); })
+            $statusRefresh.on('click', function () { self.refreshServiceStatus(); });
             $mainPanel.append($statusRefresh);
             var $serviceStatusDiv = $('<div>');
             $mainPanel.append($serviceStatusDiv);

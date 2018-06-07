@@ -7,14 +7,13 @@
 
 define([
     'jquery',
-    'bluebird',
     'kb_service/client/catalog',
+
     'kb_widget/legacy/authenticatedWidget'
 ], function (
     $,
-    Promise,
     Catalog) {
-
+    'use strict';
     $.KBWidget({
         name: 'KBaseViewSDKRegistrationLog',
         parent: 'kbaseAuthenticatedWidget',
@@ -42,7 +41,7 @@ define([
             );
 
             // Create a message pane
-            this.$messagePane = $("<div/>").addClass("kbwidget-message-pane kbwidget-hide-message");
+            this.$messagePane = $('<div/>').addClass('kbwidget-message-pane kbwidget-hide-message');
             this.$elem.append(this.$messagePane);
             this.loading(true);
 
@@ -52,11 +51,11 @@ define([
             return this;
         },
 
-        loggedInCallback: function (event, auth) {
+        loggedInCallback: function () {
             return this;
         },
 
-        loggedOutCallback: function (event, auth) {
+        loggedOutCallback: function () {
             return this;
         },
 
@@ -67,27 +66,27 @@ define([
             var $table = $('<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;" />');
 
             container.append($table);
-            var width = "15%"
+            var width = '15%';
 
             $table.append('<tr><td width="' + width + '">Registration ID</td><td><a href="#catalog/register/' + self.registration_id + '">' +
                 self.registration_id + '</a></td></tr>');
 
-            self.$registration_state_td = $('<td></td>')
+            self.$registration_state_td = $('<td></td>');
             $table.append(
                 $('<tr>')
-                .append($('<td width="' + width + '">Progress</td>'))
-                .append(self.$registration_state_td));
+                    .append($('<td width="' + width + '">Progress</td>'))
+                    .append(self.$registration_state_td));
 
-            self.$log_window = $('<textarea style="width:100%;font-family:Monaco,monospace;font-size:9pt;color:#555;resize:vertical;" rows="' + self.options.n_rows + '" readonly>')
+            self.$log_window = $('<textarea style="width:100%;font-family:Monaco,monospace;font-size:9pt;color:#555;resize:vertical;" rows="' + self.options.n_rows + '" readonly>');
             container.append(self.$log_window);
 
-            self.$track_checkbox = $('<input type="checkbox">').prop('checked', true);;
-            var $checkboxContainer = $('<div>').addClass('checkbox').css({ width: "100%" })
+            self.$track_checkbox = $('<input type="checkbox">').prop('checked', true);
+            var $checkboxContainer = $('<div>').addClass('checkbox').css({ width: '100%' })
                 .append($('<label>')
                     .append(self.$track_checkbox)
                     .append('Auto scroll to new log output'));
 
-            container.append($checkboxContainer)
+            container.append($checkboxContainer);
 
             self.getLogAndState(self.registration_id, 0);
         },
@@ -97,19 +96,17 @@ define([
             return null;
         },
 
-        loadState: function (state) {},
-
-
+        loadState: function () {},
 
         // should load up all the way to the end
         getParsedLog: function (skip) {
             var self = this;
             var chunk_size = 5000;
             return self.catalogClient.get_parsed_build_log({
-                    'registration_id': self.registration_id,
-                    'skip': skip,
-                    'limit': chunk_size
-                })
+                'registration_id': self.registration_id,
+                'skip': skip,
+                'limit': chunk_size
+            })
                 .then(function (build_info) {
                     var log_length = skip + build_info.log.length;
                     self.last_log_line = log_length;
@@ -128,27 +125,22 @@ define([
                         self.updateBuildState(build_info.registration, build_info.error_message, build_info);
                     }
                 });
-
-
         },
 
         escapeHtml: function (text) {
-            'use strict';
-            return text.replace(/[\"&<>]/g, function (a) {
+            return text.replace(/["&<>]/g, function (a) {
                 return { '"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;' }[a];
             });
         },
-
 
         getLogAndState: function (registration_id, skip) {
             var self = this;
             return self.getParsedLog(skip);
         },
 
-
         appendLineToLog: function (line) {
-            self = this;
-            self.$log_window.append(line)
+            let self = this;
+            self.$log_window.append(line);
 
             if (self.$track_checkbox.prop('checked')) {
                 self.$log_window.scrollTop(self.$log_window[0].scrollHeight); // scroll to bottom
@@ -158,20 +150,20 @@ define([
         updateBuildState: function (state, error, build_info) {
             var self = this;
             self.loading(false);
-            self.$registration_state_td
+            self.$registration_state_td;
             if (state === 'error') {
                 self.$registration_state_td.empty()
                     .append($('<span>').addClass('label label-danger').append(state))
                     .append('<br><br>')
                     .append(error);
             } else if (state !== 'complete') {
-                self.$registration_state_td.empty().append(state)
-                setTimeout(function (event) {
+                self.$registration_state_td.empty().append(state);
+                setTimeout(function () {
                     self.getLogAndState(self.registration_id, self.last_log_line);
                 }, 1000);
             } else {
                 self.$registration_state_td.empty()
-                    .append($('<span>').addClass('label label-success').append(state))
+                    .append($('<span>').addClass('label label-success').append(state));
                 if (self.options.show_module_links) {
                     self.$registration_state_td.append('&nbsp;&nbsp;&nbsp;');
                     self.$registration_state_td.append(
@@ -192,7 +184,7 @@ define([
         },
 
         showMessage: function (message) {
-            var span = $("<span/>").append(message);
+            var span = $('<span/>').append(message);
             this.$messagePane.append(span);
             this.$messagePane.show();
         },

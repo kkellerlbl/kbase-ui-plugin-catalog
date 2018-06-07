@@ -1,16 +1,13 @@
 define([
     'jquery',
-    'bluebird',
-    'kb_service/client/narrativeMethodStore',
     'kb_service/client/catalog',
     '../catalog_util',
+
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
 ], function (
-    $, 
-    Promise, 
-    NarrativeMethodStore, 
-    Catalog, 
+    $,
+    Catalog,
     CatalogUtil
 ) {
     'use strict';
@@ -80,8 +77,8 @@ define([
 
         setupClients: function () {
             this.catalog = new Catalog(
-                this.runtime.getConfig('services.catalog.url'), { 
-                    token: this.runtime.service('session').getAuthToken() 
+                this.runtime.getConfig('services.catalog.url'), {
+                    token: this.runtime.service('session').getAuthToken()
                 });
         },
 
@@ -354,7 +351,7 @@ define([
                                     type = tokens[1];
                                 }
                             }
-                            if (i > 0) { 
+                            if (i > 0) {
                                 inputs += ', ';
                             }
                             inputs += type;
@@ -378,7 +375,7 @@ define([
                                     type = tokens[1];
                                 }
                             }
-                            if (i > 0) { 
+                            if (i > 0) {
                                 inputs += ', ';
                             }
                             outputs += type;
@@ -420,7 +417,6 @@ define([
         },
 
         escapeHtml: function (text) {
-            'use strict';
             return text.replace(/["&<>]/g, function (a) {
                 return { '"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;' }[a];
             }).replace(/(?:\r\n|\r|\n)/g, '<br />');

@@ -1,0 +1,22 @@
+# Basic test
+---
+-
+    description: Ensure the main views load
+    baseSelector:
+        -
+            type: plugin
+            value: catalog
+    tasks:
+        -
+            title: login
+            subtask: dashboard
+        -
+            title: 'Navigate to catalog main view'
+            navigate: 
+                path: appcatalog
+        -
+            selector: []
+            wait: 10000
+        -
+            title: logout
+            subtask: logout

@@ -1,19 +1,20 @@
 define([
     'jquery',
     'bluebird',
-    'kb_service/client/narrativeMethodStore',
     'kb_service/client/catalog',
     '../catalog_util',
+
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap'
 ],
 function (
-    $, 
+    $,
     Promise,
-    NarrativeMethodStore, 
-    Catalog, 
+    Catalog,
     CatalogUtil
 ) {
+    'use strict';
+
     $.KBWidget({
         name: 'KBaseCatalogAdmin',
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
@@ -328,7 +329,7 @@ function (
 
             $modList.append('<i> ' + self.unreleased_modules.length + ' Unreleased Modules</i><br>');
             $tbl = $('<table>').addClass('table table-hover table-condensed');
-            
+
             for (k = 0; k < self.unreleased_modules.length; k++) {
                 $tbl.append(
                     $('<tr>')

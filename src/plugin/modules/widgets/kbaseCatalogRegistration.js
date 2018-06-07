@@ -6,7 +6,13 @@ define([
     './kbaseViewSDKRegistrationLog',
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
-], function ($, NarrativeMethodStore, Catalog) {
+], function (
+    $,
+    NarrativeMethodStore,
+    Catalog
+) {
+    'use strict';
+
     $.KBWidget({
         name: 'KBaseCatalogRegistration',
         parent: 'kbaseAuthenticatedWidget',
@@ -73,8 +79,8 @@ define([
 
                 var $git_url_group =
                     $('<div>').addClass('form-group')
-                    .append($('<label for="git_url">Module Git URL</label>'))
-                    .append($gitUrlInput);
+                        .append($('<label for="git_url">Module Git URL</label>'))
+                        .append($gitUrlInput);
                 if (!self.options.git_url) {
                     $registrationForm.append($git_url_group);
                 } else {
@@ -83,8 +89,8 @@ define([
 
                 var $git_commit_group =
                     $('<div>').addClass('form-group')
-                    .append($('<label for="git_url">Commit (optional)</label>'))
-                    .append($commitInput);
+                        .append($('<label for="git_url">Commit (optional)</label>'))
+                        .append($commitInput);
                 $registrationForm.append($git_commit_group);
 
                 var $warning = $('<span>').addClass('label label-warning');
@@ -114,7 +120,7 @@ define([
                     $registerBtn.hide();
 
                     // register the thing
-                    self.register(submitted_git_url, submitted_git_hash)
+                    self.register(submitted_git_url, submitted_git_hash);
 
                 });
 
@@ -159,7 +165,7 @@ define([
 
         showRegistrationLog: function (registration_id) {
             var self = this;
-            var $logWidget = $('<div>')
+            var $logWidget = $('<div>');
             self.logWidget = $logWidget['KBaseViewSDKRegistrationLog']({
                 registration_id: registration_id,
                 runtime: self.runtime,
@@ -170,7 +176,7 @@ define([
         },
 
 
-        initMainPanel: function ($appListPanel, $moduleListPanel) {
+        initMainPanel: function () {
             var $mainPanel = $('<div>').addClass('container-fluid');
             var $inputPanel = $('<div>');
             var $logPanel = $('<div>').hide();

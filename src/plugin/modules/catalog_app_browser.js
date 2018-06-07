@@ -1,17 +1,19 @@
-/*global
- define
- */
-/*jslint
- browser: true,
- white: true
- */
 define([
     'bluebird',
     'kb_common/dom',
     'kb_common/html',
     'kb_widget/widgetSet'
-], function (Promise, DOM, html, WidgetSet) {
+], function (
+    Promise,
+    DOM,
+    html,
+    WidgetSet
+) {
     'use strict';
+
+    let t = html.tag,
+        div = t('div');
+
     function widget(config) {
         var mount, container, runtime = config.runtime,
             widgetSet = WidgetSet.make({runtime: runtime}),
@@ -20,15 +22,13 @@ define([
         // Mini widget manager
         // TODO: the jquery name should be stored in the widget definition not here.
         function render() {
-
             // the catalog home page is simple the catalog browser
-            var div=html.tag('div');
             return div({
-                id: widgetSet.addWidget('catalog_browser',
-                    {
-                        jqueryName: 'KBaseCatalogBrowser',
-                        jquery_name:'KBaseCatalogBrowser'
-                    })
+                id: widgetSet.addWidget('catalog_browser', {
+                    jqueryName: 'KBaseCatalogBrowser',
+                    jquery_name:'KBaseCatalogBrowser'
+                }),
+                dataKBTesthookPlugin: 'catalog'
             });
         }
 
@@ -43,13 +43,11 @@ define([
         }
         function attach(node) {
             runtime.send('ui', 'setTitle', 'App Catalog');
-            return Promise.try(function () {
-                mount = node;
-                container = mount.appendChild(DOM.createElement('div'));
-                container.innerHTML = layout;
-                // mount.appendChild(container);
-                return widgetSet.attach();
-            });
+            mount = node;
+            container = mount.appendChild(DOM.createElement('div'));
+            container.innerHTML = layout;
+            // mount.appendChild(container);
+            return widgetSet.attach();
         }
         function start(params) {
             return Promise.try(function () {
@@ -57,25 +55,17 @@ define([
             });
         }
         function run(params) {
-            return Promise.try(function () {
-                return widgetSet.run(params);
-            });
+            return widgetSet.run(params);
         }
         function stop() {
-            return Promise.try(function () {
-                return widgetSet.stop();
-            });
+            return widgetSet.stop();
         }
         function detach() {
             runtime.send('ui', 'setTitle', '');
-            return Promise.try(function () {
-                return widgetSet.detach();
-            });
+            return widgetSet.detach();
         }
         function destroy() {
-            return Promise.try(function () {
-                return widgetSet.destroy();
-            });
+            return widgetSet.destroy();
         }
 
         // Widget Interface

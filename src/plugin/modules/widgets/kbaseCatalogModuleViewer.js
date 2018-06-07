@@ -11,12 +11,12 @@ define([
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap'
 ], function (
-    $, 
-    Promise, 
-    NarrativeMethodStore, 
-    Catalog, 
-    CatalogUtil, 
-    AppCard, 
+    $,
+    Promise,
+    NarrativeMethodStore,
+    Catalog,
+    CatalogUtil,
+    AppCard,
     FunctionCard
 ) {
     'use strict';
@@ -32,7 +32,7 @@ define([
         catalog: null,
         nms: null,
 
-        // 
+        //
         module_name: null,
         moduleDetails: null,
         appList: null,
@@ -440,12 +440,12 @@ define([
 
         setupClients: function () {
             this.catalog = new Catalog(
-                this.runtime.getConfig('services.catalog.url'), { 
-                    token: this.runtime.service('session').getAuthToken() 
+                this.runtime.getConfig('services.catalog.url'), {
+                    token: this.runtime.service('session').getAuthToken()
                 });
             this.nms = new NarrativeMethodStore(
-                this.runtime.getConfig('services.narrative_method_store.url'), { 
-                    token: this.runtime.service('session').getAuthToken() 
+                this.runtime.getConfig('services.narrative_method_store.url'), {
+                    token: this.runtime.service('session').getAuthToken()
                 });
             this.nms_base_url = this.runtime.getConfig('services.narrative_method_store.url');
             this.nms_base_url = this.nms_base_url.substring(0, this.nms_base_url.length - 3);
