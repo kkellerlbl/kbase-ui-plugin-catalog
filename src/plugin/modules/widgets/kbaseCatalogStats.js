@@ -162,9 +162,8 @@ define([
         reformatDateInTD: function ($td) {
             var timestamp = parseInt($td.text(), 10);
             if (Number.isNaN(timestamp)) {
-                $td.text('...');
-            }
-            else {
+                $td.text('-');
+            } else {
                 var date = new Date(timestamp).toLocaleString();
                 $td.text(date);
             }
@@ -173,9 +172,8 @@ define([
         reformatIntervalInTD: function ($td) {
             var timestamp = parseInt($td.text(), 10) / 1000;
             if (Number.isNaN(timestamp)) {
-                $td.text('...');
-            }
-            else {
+                $td.text('-');
+            } else {
                 $td.text(this.getNiceDuration(timestamp));
             }
         },
@@ -815,7 +813,10 @@ define([
 
             self.adminRecentRuns = [];
 
-            return self.metricsClient.callFunc('get_app_metrics', [{ epoch_range: [then, now], user_ids: self.options.usernames }]).then(function (data) {
+            return self.metricsClient.callFunc('get_app_metrics', [{
+                epoch_range: [then, now],
+                user_ids: self.options.usernames
+            }]).then(function (data) {
                 var jobs = data[0].job_states;
 
                 jobs.forEach(function (job) {
@@ -826,30 +827,26 @@ define([
                         var appModule = job.app_id.split('/');
                         job.app_id = '<a href="#catalog/apps/' + appModule[0] + '/' + appModule[1] + '" target="_blank">' + appModule[1] + '</a>';
                         job.app_module_name = '<a href="#catalog/modules/' + appModule[0] + '" target="_blank">' + appModule[0] + '</a>';
-                    }
-                    else if (job.method) {
+                    } else if (job.method) {
                         var methodPieces = job.method.split('.');
                         job.app_id = '(API):' + methodPieces[1];
                         job.app_module_name = '<a href="#catalog/modules/' + methodPieces[0] + '" target="_blank">' + methodPieces[0] + '</a>';
-                    }
-                    else {
+                    } else {
                         job.app_id = 'Unknown';
                         job.app_module_name = 'Unknown';
                     }
 
                     if (job.error) {
                         job.result = '<span class="label label-danger">Error</span>';
-                    }
-                    else if (!job.finish_time) {
+                    } else if (!job.finish_time) {
                         job.result = job.exec_start_time
                             ? '<span class="label label-warning">Running</span>'
                             : '<span class="label label-warning">Queued</span>';
-                    }
-                    else {
+                    } else {
                         job.result = '<span class="label label-success">Success</span>';
                     }
 
-                    if (job.complete) {
+                    if (job.complete || job.exec_start_time) {
                         job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
@@ -861,25 +858,31 @@ define([
 
                     if (job.finish_time) {
                         job.run_time = job.finish_time - job.exec_start_time;
-                    }
-                    else if (job.exec_start_time) {
+                    } else if (job.exec_start_time) {
                         job.run_time = Date.now() - job.exec_start_time;
+                    } else {
+                        job.run_time = null;
                     }
 
                     if ( job.complete && ! job.finish_time) {
                         job.finish_time = job.modification_time;
                     }
 
-                    job.queue_time = job.exec_start_time
-                        ? job.exec_start_time - job.creation_time
-                        : 0;
+                    if (job.creation_time) {
+                        if (job.exec_start_time) {
+                            job.queue_time = job.exec_start_time - job.creation_time;
+                        } else {
+                            job.queue_time = Date.now() - job.creation_time;
+                        }
+                    } else {
+                        this.queue_time = null;
+                    }
 
                     if (job.client_groups) {
                         job.client_groups = job.client_groups.join(',');
                     }
 
                     self.adminRecentRuns.push(job);
-
                 });
 
                 self.adminRecentRuns = self.adminRecentRuns.sort(function (a, b) {
@@ -908,8 +911,6 @@ define([
 
         },
 
-
-
         checkIsAdmin: function () {
             var self = this;
             self.isAdmin = true;
@@ -924,7 +925,5 @@ define([
                     return Promise.try(function () { });
                 });
         }
-
-
     });
 });
