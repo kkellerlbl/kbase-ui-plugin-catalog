@@ -860,25 +860,31 @@ define([
                         job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
                     }
 
-                    // TODO: remove when kb_Metrics is correct to calculate finish_time for errored jobs
-                    if (job.error && !job.finish_time) {
-                        job.finish_time = job.modification_time;
+                    // TODO: remove when kb_Metrics is correct to either always return modification_time,
+                    // or to set finish_time for complete with error.
+                    if (job.complete && !job.error) {
+                        job.modification_time = job.finish_time;
                     }
-                    
+
                     // Calculate elapsed run time for finished and continuing jobs.
-                    if (job.finish_time) {
-                        job.run_time = job.finish_time - job.exec_start_time;
-                    }  else if (job.exec_start_time) {
-                        job.run_time = Date.now() - job.exec_start_time;
+                    if (job.exec_start_time) {
+                        if (job.complete) {
+                            job.run_time = job.modification_time - job.exec_start_time;
+                        }  else {
+                            job.run_time = Date.now() - job.exec_start_time;
+                        }
                     } else {
                         job.run_time = null;
                     }
 
                     // Calculate elapsed queue time, for finished and continuing jobs.
+                    // This just relies on the creation and start times.
                     if (job.creation_time) {
                         if (job.exec_start_time) {
+                            // For started jobs, the queue elapsed time is fixed.
                             job.queue_time = job.exec_start_time - job.creation_time;
                         } else {
+                            // Otherwise, relative to now.
                             job.queue_time = Date.now() - job.creation_time;
                         }
                     } else {
