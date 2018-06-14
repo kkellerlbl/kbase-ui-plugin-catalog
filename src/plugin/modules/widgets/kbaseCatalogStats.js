@@ -836,6 +836,7 @@ define([
                         job.app_module_name = 'Unknown';
                     }
 
+                    // Create a label to represent the current state of the job.
                     if (job.error) {
                         job.result = '<span class="label label-danger">Error</span>';
                     } else if (!job.finish_time) {
@@ -843,10 +844,13 @@ define([
                             ? '<span class="label label-warning">Running</span>'
                             : '<span class="label label-warning">Queued</span>';
                     } else {
+                        // TODO: why isn't the condition job.complete for showing Success?
                         job.result = '<span class="label label-success">Success</span>';
                     }
 
-                    if (job.complete || job.exec_start_time) {
+                    // Creates a job log viewer button for any job which has been or is being
+                    // run.
+                    if (job.exec_start_time) {
                         job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
@@ -856,18 +860,21 @@ define([
                         job.narrative_name = '<a href="/narrative/ws.' + job.wsid + '.obj.' + job.narrative_objNo + '" target="_blank">' + job.narrative_name + '</a>';
                     }
 
+                    // TODO: remove when kb_Metrics is correct to calculate finish_time for errored jobs
+                    if (job.error && !job.finish_time) {
+                        job.finish_time = job.modification_time;
+                    }
+                    
+                    // Calculate elapsed run time for finished and continuing jobs.
                     if (job.finish_time) {
                         job.run_time = job.finish_time - job.exec_start_time;
-                    } else if (job.exec_start_time) {
+                    }  else if (job.exec_start_time) {
                         job.run_time = Date.now() - job.exec_start_time;
                     } else {
                         job.run_time = null;
                     }
 
-                    if ( job.complete && ! job.finish_time) {
-                        job.finish_time = job.modification_time;
-                    }
-
+                    // Calculate elapsed queue time, for finished and continuing jobs.
                     if (job.creation_time) {
                         if (job.exec_start_time) {
                             job.queue_time = job.exec_start_time - job.creation_time;
