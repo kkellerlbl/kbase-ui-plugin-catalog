@@ -21,4 +21,4 @@ orderings:
         - metabolic_modeling
         - expression
         - communities
-        - utilities
+        - util
