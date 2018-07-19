@@ -436,7 +436,8 @@ define([
                         updateFunction: self.createDynamicUpdateFunction(adminRecentRunsConfig, adminRecentRunsRestructuredRows),
                         rowFunction: function ($row) {
 
-                            var $jobLogButton;
+                            var $jobLogButton    = $row.children().find('[data-log-job-id]');
+                            var $jobCancelButton = $row.children().find('[data-cancel-job-id]');;
 
 
                             if (self.options.useUserRecentRuns) {
@@ -444,7 +445,6 @@ define([
                                 self.reformatIntervalInTD($row.children().eq(3));
                                 self.reformatIntervalInTD($row.children().eq(4));
 
-                                $jobLogButton = $row.children().eq(5).find('button');
                             }
                             else {
                                 self.reformatDateInTD($row.children().eq(4));
@@ -452,9 +452,8 @@ define([
                                 self.reformatDateInTD($row.children().eq(6));
                                 self.reformatIntervalInTD($row.children().eq(7));
 
-                                $jobLogButton = $row.children().eq(8).find('button');
                             }
-                            var job_id = $jobLogButton.data('job-id');
+                            var job_id = $jobLogButton.data('log-job-id');
 
                             /* The Status field has a button which'll show the job log. This wires it up to do so.
                                    Note that it cheats out the ass - it'll manually append a new row to the table, which is outside
@@ -476,6 +475,25 @@ define([
                                     $row.after($tr);
                                 }
                             });
+
+                            $jobCancelButton.on('click', function() {
+                              if (window.confirm('Really cancel job?')) {
+                                self.njs.cancel_job({ job_id: job_id })
+                                  .then(function (res) {
+                                    /* We don't really care on success or failure. Just blissfully assume all is well on the njs side and ignore it.
+                                       There may be valid things to put in here. Maybe have it automatically refresh? That may be jarring to the user. */
+                                  })
+                                  .catch(function(err) {
+
+                                  });
+
+                               }
+                              else {
+                                console.log("SAVED");
+                              }
+                            });
+
+
 
                             return $row;
                         }
@@ -522,7 +540,7 @@ define([
                                     $('<div>').addClass('col-md-12')
                                         .append(
                                             $('<h4>')
-                                                .append('Recent Runs (submitted in ')
+                                                .append('!!!Recent Runs (submitted in ')
                                                 .append(self.numHoursField)
                                                 .append('):')
                                         )
@@ -843,6 +861,8 @@ define([
                         job.result = job.exec_start_time
                             ? '<span class="label label-warning">Running</span>'
                             : '<span class="label label-warning">Queued</span>';
+                    } else if (job.status === 'canceled by user') {
+                      job.result = '<span class="label label-info">Canceled</span>';
                     } else {
                         // TODO: why isn't the condition job.complete for showing Success?
                         job.result = '<span class="label label-success">Success</span>';
@@ -851,7 +871,11 @@ define([
                     // Creates a job log viewer button for any job which has been or is being
                     // run.
                     if (job.exec_start_time) {
-                        job.result += ' <button class="btn btn-default btn-xs" data-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
+                        job.result += ' <button class="btn btn-default btn-xs" data-log-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
+                    }
+
+                    if (job.exec_start_time && !job.finish_time) {
+                      job.result += ' <button class="btn btn-danger btn-xs" data-cancel-job-id="' + job.job_id + '"> <i class="fa fa-ban"></i></button>';
                     }
 
                     job.result = '<span style="white-space : nowrap">' + job.result + '</span>';
