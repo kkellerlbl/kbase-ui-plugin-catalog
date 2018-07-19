@@ -540,7 +540,7 @@ define([
                                     $('<div>').addClass('col-md-12')
                                         .append(
                                             $('<h4>')
-                                                .append('!!!Recent Runs (submitted in ')
+                                                .append('Recent Runs (submitted in ')
                                                 .append(self.numHoursField)
                                                 .append('):')
                                         )
