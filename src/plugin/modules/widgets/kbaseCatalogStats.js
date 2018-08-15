@@ -874,7 +874,7 @@ define([
                         job.result += ' <button class="btn btn-default btn-xs" data-log-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
-                    if (job.exec_start_time && !job.finish_time) {
+                    if (job.exec_start_time && !job.finish_time && !job.error) {
                       job.result += ' <button class="btn btn-danger btn-xs" data-cancel-job-id="' + job.job_id + '"> <i class="fa fa-ban"></i></button>';
                     }
 
