@@ -101,6 +101,12 @@ define([
                 .append($('<div>').append(descriptionText));
             $m.append('<hr>');
 
+                       descriptionText = 'View the current status of the HTCondor Job Queue';
+            $m.append($('<h4>').append(self.makeLink(base + 'queue', 'Job Queue')))
+                .append($('<div>').append(descriptionText));
+            $m.append('<hr>');
+
+
 
             descriptionText = 'View summary statistics of KBase Apps.';
             $m.append($('<h4>').append(self.makeLink(base + 'stats', 'Catalog Stats')))

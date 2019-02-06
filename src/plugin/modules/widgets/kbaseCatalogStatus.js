@@ -170,7 +170,7 @@ define([
                     $li.append(']<br>');
                     $li.append('Registered on: ' + new Date(mod.timestamp).toLocaleString() + '<br>');
                     $ul.append($li);
-                }
+                    }
                 self.$basicStatusDiv.append('<br>');
                 self.$basicStatusDiv.append($ul);
             } else {
