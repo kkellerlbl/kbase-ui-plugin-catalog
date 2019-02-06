@@ -233,10 +233,10 @@ define([
 
             var title;
             if (self.isAdmin) {
-                title = "Condor Job Stats (Administrator): Last updated: " + self.jobStatsCreated;
+                title = "Condor Job Stats (Administrator): Last updated (UTC): " + self.jobStatsCreated;
             }
             else {
-                title = "Condor Job Stats <" + self.me + "> Last updated: " + self.jobStatsCreated;
+                title = "Condor Job Stats <" + self.me + "> Last updated (UTC): " + self.jobStatsCreated;
 
             }
 
