@@ -98,7 +98,7 @@ define([
 
             self.$loadingPanel = self.util.initLoadingPanel();
             self.$elem.append(self.$loadingPanel);
-            var mainPanelElements = self.initMainPanel();
+            //var mainPanelElements = self.initMainPanel();
             // [$mainPanel, $header, $screenshotsPanel, $descriptionPanel, $paramsPanel, $publicationsPanel, $infoPanel];
             self.$mainPanel = mainPanelElements[0];
             self.$headerPanel = mainPanelElements[1];

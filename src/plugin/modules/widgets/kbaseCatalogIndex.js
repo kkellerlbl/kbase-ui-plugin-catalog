@@ -97,7 +97,7 @@ define([
 
 
             descriptionText = 'View the current status of the KBase Catalog Service, such as recent module registrations.';
-            $m.append($('<h4>').append(self.makeLink(base + 'status', 'Catalog Status')))
+            $m.append($('<h4>').append(self.makeLink(base + 'status', 'Catalog App Registration Status')))
                 .append($('<div>').append(descriptionText));
             $m.append('<hr>');
 
@@ -109,7 +109,7 @@ define([
 
 
             descriptionText = 'View summary statistics of KBase Apps.';
-            $m.append($('<h4>').append(self.makeLink(base + 'stats', 'Catalog Stats')))
+            $m.append($('<h4>').append(self.makeLink(base + 'stats', 'Job Run Statistics')))
                 .append($('<div>').append(descriptionText));
             $m.append('<hr>');
 

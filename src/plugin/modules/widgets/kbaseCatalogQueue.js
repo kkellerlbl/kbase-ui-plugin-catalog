@@ -24,8 +24,8 @@ define([
         parent: 'kbaseAuthenticatedWidget', // todo: do we still need th
         options: {
 
-        appendQueueStatusTable: true,
-        appendJobStatusTable: true,
+            appendQueueStatusTable: true,
+            appendJobStatusTable: true,
         },
 
         // clients to the catalog service and the NarrativeMethodStore
@@ -200,25 +200,31 @@ define([
             var $basicJobStatsContainer = $('<div>').css('width', '100%');
 
 
-            console.log("JOB STATS ARE");
-            console.log(self.jobStats);
-
             var basicJobStatsConfig = {
                 rowsPerPage: 50,
                 headers: [
                     {text: 'Username', id: 'AcctGroup', isSortable: true},
-                    {text: 'JobBatchName', id: 'id', isSortable: true},
-                    {text: 'CondorID', id: 'ClusterId', isSortable: true},
+                    {text: 'Job UUID', id: 'id', isSortable: true},
+                    {text: 'Job ID', id: 'ClusterId', isSortable: true},
                     {text: 'kb_app_id', id: 'kb_app_id', isSortable: true},
-                    {text: 'kb_function_name', id: 'kb_function_name', isSortable: true},
-                    {text: 'kb_module_name', id: 'kb_module_name', isSortable: true},
+                    // {text: 'kb_function_name', id: 'kb_function_name', isSortable: true},
+                    // {text: 'kb_module_name', id: 'kb_module_name', isSortable: true},
                     {text: 'RemoteHost', id: 'RemoteHost', isSortable: true},
                     {text: 'Submission Time', id: 'QDateHuman', isSortable: true},
                     {text: 'Job Status', id: 'JobStatusHuman', isSortable: true},
                     {text: '# Jobs Ahead', id: 'JobsAhead', isSortable: true},
-
+                    {text: 'Queue', id: 'CLIENTGROUP', isSortable: true},
                 ],
             };
+
+            if (self.isAdmin) {
+                basicJobStatsConfig.headers.push({
+                    text: 'Possible Issues *',
+                    id: 'LastRejMatchReason',
+                    isSortable: true
+                });
+            }
+
 
             var queueStatsRestructuredRows = self.restructureRows(basicJobStatsConfig, self.jobStats);
 
@@ -226,25 +232,62 @@ define([
                 {
                     headers: basicJobStatsConfig.headers,
                     rowsPerPage: basicJobStatsConfig.rowsPerPage,
-                     enableDownload: self.isAdmin,
+                    enableDownload: self.isAdmin,
                     updateFunction: self.createDynamicUpdateFunction(basicJobStatsConfig, queueStatsRestructuredRows)
                 }
             );
 
             var title;
             if (self.isAdmin) {
-                title = "Condor Job Stats (Administrator): Last updated (UTC): " + self.jobStatsCreated;
+                title = "Jobs Status (Administrator): Queue Data Current as of  " + self.jobStatsCreated;
             }
             else {
-                title = "Condor Job Stats <" + self.me + "> Last updated (UTC): " + self.jobStatsCreated;
+                title = "Jobs Status <" + self.me + ">: Queue Data Current as of " + self.jobStatsCreated;
 
             }
 
+            //This is probably a blocking operation?
+            var $jqElem = $('<button>')
+                .addClass('btn btn-default')
+                .on('click', function (e) {
+
+                // get the module information
+                var loadingCalls = [];
+
+                self.showLoading();
+
+                 // self.$mainPanel.remove();
+                 self.$basicStatsDiv.empty();
+
+                loadingCalls.push(self.getQueueStatus());
+                loadingCalls.push(self.getJobStats());
+
+                // when we have it all, then render the list
+                Promise.all(loadingCalls).then(function () {
+                    self.render();
+                    self.hideLoading();
+                });
+
+                })
+                .attr('title', 'Refresh jobs data')
+                .append($.jqElem('i').addClass('fa fa-refresh'));
+
+
+           var row =  $('<div>').addClass('row').append($('<div>').addClass('col-md-11').append('<h4>' + title + '</h4>'));
+           row.append($('<div>').addClass('col-md-1').append($jqElem));
+
+
+
+
+
+
+
+
             var $container = $('<div>').addClass('container-fluid')
-                .append($('<div>').addClass('row')
-                    .append($('<div>').addClass('col-md-12')
-                        .append('<h4>' + title + '</h4>')
-                        .append($basicJobStatsContainer)));
+                .append(row)
+                .append($basicJobStatsContainer);
+
+
 
             if (self.options.appendJobStatusTable) {
                 self.$basicStatsDiv.append($container);
@@ -256,44 +299,101 @@ define([
         renderQueueStats: function () {
             var self = this;
             // prep the container + data for basic stats
-            var $basicQueueStatsContainer = $('<div>').css('width', '100%');
+            var $basicQueueStatsContainer = $('<div>').css('width', '70%');
+
+            var table = $('<table>').addClass('table table-striped table-bordered');
+            var headers = ['Queue Name', 'Utilization %', "# Held", '# Queued']
+
+            for (var i = 0; i < 4; i++) {
+                var row = $('<th>').addClass('ui-resizeable').text(headers[i]);
+                table.append(row);
+            }
 
 
-            var basicQueueStatsConfig = {
-                rowsPerPage: 50,
-                headers: [
-                    {text: 'Queue', id: 'id', isSortable: true},
-                    {text: 'Free Slots', id: 'free_slots', isSortable: true},
-                    {text: 'Total Slots', id: 'total_slots', isSortable: true},
-                    {text: 'Used Slots', id: 'used_slots', isSortable: true},
-                    {text: 'Held', id: 'Held', isSortable: true},
-                    {text: 'Running', id: 'Running', isSortable: true},
-                    {text: 'Queued', id: 'Idle', isSortable: true},
+            self.queueStats.forEach(function (item) {
+                var row = $('<tr>');
+                var usedFraction = "(" + item.used_slots + "/" + item.total_slots + ")";
+                var utilizationPercentage = (item.used_slots / item.total_slots)
+                var utilizationMsg = " " + (item.used_slots / item.total_slots) + "%  " + usedFraction;
 
-                ],
-            };
+                var queue_name = $('<td>').addClass('bar').text(item.id);
 
-            var queueStatsRestructuredRows = self.restructureRows(basicQueueStatsConfig, self.queueStats);
+                var utilization = $('<td>').text(utilizationMsg);
+                if (utilizationPercentage < .60)
+                    utilization.addClass('label-success')
+                else if (utilizationPercentage < 1)
+                    utilization.addClass('label-warning')
+                else
+                    utilization = $('<td>').addClass('label-danger').text("100% " + usedFraction);
 
-            new DynamicTable($basicQueueStatsContainer,
-                {
-                    headers: basicQueueStatsConfig.headers,
-                    rowsPerPage: basicQueueStatsConfig.rowsPerPage,
-                    enableDownload: false,
-                    updateFunction: self.createDynamicUpdateFunction(basicQueueStatsConfig, queueStatsRestructuredRows)
-                }
-            );
+                if (item.used_slots === undefined || item.total_slots === undefined)
+                    utilization = $('<td>').addClass('label-danger').text("Queue unavailable");
+
+
+                var queued = $('<td>').text(item.Held);
+                var held = $('<td>').text(item.Idle);
+                row.append([queue_name, utilization, queued, held]);
+
+
+                table.append(row);
+            });
+
+
+            $basicQueueStatsContainer.append(table);
 
 
             var $container = $('<div>').addClass('container-fluid')
                 .append($('<div>').addClass('row')
                     .append($('<div>').addClass('col-md-12')
-                        .append('<h4>Condor Queue Status:</h4>')
+                        .append('<h4>Queue Status:</h4>')
                         .append($basicQueueStatsContainer)));
+
 
             if (self.options.appendQueueStatusTable) {
                 self.$basicStatsDiv.append($container);
             }
+
+
+            //
+            // var basicQueueStatsConfig = {
+            //     rowsPerPage: 50,
+            //     headers: [
+            //         {text: 'Queue Name', id: 'id', isSortable: true},
+            //         {text: 'Free Slots', id: 'free_slots', isSortable: true},
+            //         {text: 'Total Slots', id: 'total_slots', isSortable: true},
+            //         {text: 'Used Slots', id: 'used_slots', isSortable: true},
+            //         {text: 'Held', id: 'Held', isSortable: true},
+            //         {text: 'Running', id: 'Running', isSortable: true},
+            //         {text: 'Queued', id: 'Idle', isSortable: true},
+            //
+            //     ],
+            // };
+            //
+            // var queueStatsRestructuredRows = self.restructureRows(basicQueueStatsConfig, self.queueStats);
+            //
+            // new DynamicTable($basicQueueStatsContainer,
+            //     {
+            //         headers: basicQueueStatsConfig.headers,
+            //         rowsPerPage: basicQueueStatsConfig.rowsPerPage,
+            //         enableDownload: false,
+            //         updateFunction: self.createDynamicUpdateFunction(basicQueueStatsConfig, queueStatsRestructuredRows)
+            //     }
+            // );
+            //
+            //
+            // var $container = $('<div>').addClass('container-fluid')
+            //     .append($('<div>').addClass('row')
+            //         .append($('<div>').addClass('col-md-12')
+            //             .append('<h4>Condor Queue Status:</h4>')
+            //             .append($basicQueueStatsContainer)));
+            //
+            // if (self.options.appendQueueStatusTable) {
+            //     self.$basicStatsDiv.append($container);
+            // }
+            //
+            // var $basicQueueStatsContainer2 = $('<div>').css('width', '100%');
+
+
         },
 
 
@@ -373,22 +473,33 @@ define([
 
 
         getQueueStatus: function () {
+
+            function compare(a, b) {
+                if (a.id.toString() < b.id.toString())
+                    return -1;
+                if (a.id.toString() > b.id.toString())
+                    return 1;
+                return 0;
+            }
+
             var self = this;
             return self.condor_statsClient.callFunc('queue_status', [{}])
                 .then(function (data) {
                     self.queueStats = [];
                     data = data[0];
+
                     $.each(data, function (key, value) {
                         if (jQuery.type(value) == 'object') {
                             value.id = key;
                             for (var k in value) {
                                 //Fix for zero values not being rendered as a numeric type
-                                value[k] = value[k].toString();
+                                // value[k] = value[k].toString();
                             }
                             if (key != 'unknown')
                                 self.queueStats.push(value);
                         }
                     });
+                    self.queueStats = self.queueStats.sort(compare);
                 })
                 .catch(function (err) {
                     console.error('ERROR retrieving condor queue stats:');
@@ -409,7 +520,7 @@ define([
                 .then(function (data) {
                     self.jobStats = [];
 
-                    self.jobStatsCreated = new Date((data[0].created)).toLocaleString();
+                    self.jobStatsCreated = new Date((data[0].created) + " UTC").toLocaleString();
 
                     var rows = data[0].rows;
                     $.each(rows, function (key, value) {
@@ -425,6 +536,7 @@ define([
                             for (var k in value) {
                                 //TODO SPEED THIS UP BY MAKING JSON A STRING IN THE SERVICE ITSELF
                                 value[k] = value[k].toString();
+                                value[k] = (value[k].length > 0) ? value[k] : '-';
                                 if (k == "JobStatusHuman") {
                                     value[k] = self.labelJob(value[k]);
                                 }
@@ -435,10 +547,11 @@ define([
                                 //TODO MOVE THIS INTO THE SERVICE MAYBE
                                 if (k == "JobsAhead") {
                                     var jh = value['JobsAhead'];
-                                    if(jh != '0')
+                                    if (jh != '0')
                                         value['JobsAhead'] = jh + " (" + value['CLIENTGROUP'] + ")";
                                     ;
                                 }
+
                             }
 
 
