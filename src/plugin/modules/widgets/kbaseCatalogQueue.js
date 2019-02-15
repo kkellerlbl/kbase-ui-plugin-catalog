@@ -6,11 +6,12 @@ define([
     '../catalog_util',
     'kb_common/dynamicTable',
     'kb_common/jsonRpc/dynamicServiceClient',
-
     'datatables',
     'kb_widget/legacy/authenticatedWidget',
     'bootstrap',
     'datatables_bootstrap',
+
+
 ], function ($,
              Promise,
              Catalog,
@@ -40,6 +41,7 @@ define([
         allStats: null,
         queueStats: null,
         jobStats: null,
+        myJobStats: null,
         jobStatsCreated: null,
         me: null,
 
@@ -189,23 +191,73 @@ define([
 
             var self = this;
             self.renderQueueStats();
+
+            self.renderJobStats(self.me);
             self.renderJobStats();
+
 
         },
 
+
+        animate: function (div_id, percentage) {
+
+            var interval = setInterval(function () {
+                myTimer()
+            }, 1);
+            var count = 0;
+
+            function myTimer() {
+                if (count < 100) {
+                    $('.progress').css('width', count + "%");
+                    count += 0.8;
+
+                    // code to do when loading
+                }
+                else if (count > 99) {
+                    document.getElementById(div_id).innerHTML = percentage + "%";
+                    clearInterval(interval);
+                }
+            }
+
+
+        },
+
+
         //This function is used to render queue stats from the condor_status service
-        renderJobStats: function () {
+        renderJobStats: function (me) {
             var self = this;
+
+            if (self.jobStats == null) {
+                var $basicJobStatsContainer = $('<div>').css('width', '100%');
+                console.log("Job stats not found");
+
+                var $container = $('<div>')//.addClass('container-fluid')
+                    .append(row)
+                    .append($basicJobStatsContainer);
+
+
+                if (self.options.appendJobStatusTable) {
+                    self.$basicStatsDiv.append("<h4>Queue status currently unavailable</h4>");
+                }
+
+                return;
+
+            }
+
+
+            // var imp = "<script src='https://rawgit.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.js'></script>";
             // prep the container + data for basic stats
+
             var $basicJobStatsContainer = $('<div>').css('width', '100%');
+            // $basicJobStatsContainer.append(imp);
 
 
             var basicJobStatsConfig = {
                 rowsPerPage: 50,
                 headers: [
-                    {text: 'Username', id: 'AcctGroup', isSortable: true},
-                    {text: 'Job UUID', id: 'id', isSortable: true},
-                    {text: 'Job ID', id: 'ClusterId', isSortable: true},
+                    {text: 'Username', id: 'AcctGroup', isSortable: true,},
+                    {text: 'KBase Job UUID', id: 'id', isSortable: true},
+                    {text: 'Job ID', id: 'ClusterId', isSortable: true, isResizeable: false},
                     {text: 'kb_app_id', id: 'kb_app_id', isSortable: true},
                     // {text: 'kb_function_name', id: 'kb_function_name', isSortable: true},
                     // {text: 'kb_module_name', id: 'kb_module_name', isSortable: true},
@@ -217,16 +269,26 @@ define([
                 ],
             };
 
-            if (self.isAdmin) {
-                basicJobStatsConfig.headers.push({
-                    text: 'Possible Issues *',
-                    id: 'LastRejMatchReason',
-                    isSortable: true
-                });
+            // if (self.isAdmin) {
+            basicJobStatsConfig.headers.push({
+                text: 'Possible Issues *',
+                id: 'LastRejMatchReason',
+                isSortable: true
+            });
+            // }
+
+            var jobStats = [];
+            if (me) {
+                for (var i in self.myJobStats) {
+                    jobStats.push(self.jobStats[self.myJobStats[i]]);
+                }
+            }
+            else {
+                jobStats = self.jobStats;
             }
 
 
-            var queueStatsRestructuredRows = self.restructureRows(basicJobStatsConfig, self.jobStats);
+            var queueStatsRestructuredRows = self.restructureRows(basicJobStatsConfig, jobStats);
 
             new DynamicTable($basicJobStatsContainer,
                 {
@@ -238,160 +300,255 @@ define([
             );
 
             var title;
-            if (self.isAdmin) {
-                title = "Jobs Status (Administrator): Queue Data Current as of  " + self.jobStatsCreated;
-            }
-            else {
-                title = "Jobs Status <" + self.me + ">: Queue Data Current as of " + self.jobStatsCreated;
+            if (me)
+                title = "My Personal Job Stats (Last updated " + self.jobStatsCreated + ")"
+            else
+                title = "All Job Stats (Last updated " + self.jobStatsCreated + ")"
 
-            }
 
             //This is probably a blocking operation?
-            var $jqElem = $('<button>')
+            var $refreshButton = $('<button>')
                 .addClass('btn btn-default')
                 .on('click', function (e) {
-
-                // get the module information
-                var loadingCalls = [];
-
-                self.showLoading();
-
-                 // self.$mainPanel.remove();
-                 self.$basicStatsDiv.empty();
-
-                loadingCalls.push(self.getQueueStatus());
-                loadingCalls.push(self.getJobStats());
-
-                // when we have it all, then render the list
-                Promise.all(loadingCalls).then(function () {
-                    self.render();
-                    self.hideLoading();
-                });
+                    var loadingCalls = [];
+                    self.showLoading();
+                    self.$basicStatsDiv.empty();
+                    loadingCalls.push(self.getQueueStatus());
+                    loadingCalls.push(self.getJobStats());
+                    // when we have it all, then render the list
+                    Promise.all(loadingCalls).then(function () {
+                        self.render();
+                        self.hideLoading();
+                    });
 
                 })
                 .attr('title', 'Refresh jobs data')
                 .append($.jqElem('i').addClass('fa fa-refresh'));
 
 
-           var row =  $('<div>').addClass('row').append($('<div>').addClass('col-md-11').append('<h4>' + title + '</h4>'));
-           row.append($('<div>').addClass('col-md-1').append($jqElem));
+            var row = $('<div>').addClass('row').append($('<div>').addClass('col-md-10').append($('<h4>').text(title + " ").append($refreshButton)))
+
+            //
+            // row.append($('<div>').addClass('col-md-1').append($refreshButton));
 
 
-
-
-
-
-
-
-            var $container = $('<div>').addClass('container-fluid')
-                .append(row)
-                .append($basicJobStatsContainer);
-
+            // var $container = $('<div>').addClass('container-fluid')
+            //     .append(row)
+            //     .append($basicJobStatsContainer);
 
 
             if (self.options.appendJobStatusTable) {
-                self.$basicStatsDiv.append($container);
+                self.$basicStatsDiv.append(row.append($basicJobStatsContainer));
             }
         },
+
+        //TODO BREAK INTO SMALLER FUNCTIONS ONCE FUNCTIONALITY AND LOOK IS APPROVED
+        //TODO MAYBE MOVE QUEUE NAME LOGIC INTO ANOTHER ENDPOINT or CONFIG FILE OR INTO THE SERVICE
 
 
         //This function is used to render queue stats from the condor_status service
         renderQueueStats: function () {
             var self = this;
-            // prep the container + data for basic stats
-            var $basicQueueStatsContainer = $('<div>').css('width', '70%');
 
-            var table = $('<table>').addClass('table table-striped table-bordered');
-            var headers = ['Queue Name', 'Utilization %', "# Held", '# Queued']
-
-            for (var i = 0; i < 4; i++) {
-                var row = $('<th>').addClass('ui-resizeable').text(headers[i]);
-                table.append(row);
+            if (self.queueStats == null) {
+                console.log("Queue stats not found");
+                return;
             }
 
+
+            // prep the container + data for basic stats
+            var $basicQueueStatsContainer = $('<div>').css('width', '100%');
+
+            var table = $('<table>').css('table-layout', 'fixed').addClass('table').attr('style', 'font-size: medium !important');
+
+            // var table = $('<table>').addClass('table table-striped table-bordered');
+
+            var headers = ['Queue Name', "# Held", '# Queued', 'Utilization Percentage']
+
+            //TODO PUT THIS IN CSS CLASS
+            table
+                .append($('<th>').text('Queue Name').width('250px').css('font-size', 'x-large'))
+                .append($('<th>').text('Utilization Percentage').width('400px').css('font-size', 'x-large'))
+                .append($('<th>').text('# Queued').width('250px').css('font-size', 'x-large'))
+
+            if (self.isAdmin)
+                table.append($('<th>').text('# Held').width('250px').css('font-size', 'x-large'))
+
+
+            var available_rows = [];
+            var unavailable_rows = [];
+
+
+            var queue_names_clean = {
+                'kb_upload': "Data Import Queue",
+                'njs': "Normal Queue",
+                'bigmem': 'Large Memory Queue',
+                'bigmemlong': 'Very Large Memory Queue'
+            }
 
             self.queueStats.forEach(function (item) {
                 var row = $('<tr>');
                 var usedFraction = "(" + item.used_slots + "/" + item.total_slots + ")";
-                var utilizationPercentage = (item.used_slots / item.total_slots)
-                var utilizationMsg = " " + (item.used_slots / item.total_slots) + "%  " + usedFraction;
+                var utilizationPercentage = (item.used_slots / item.total_slots);
+                var utilizationMsg = " " + ((item.used_slots / item.total_slots) * 100).toFixed(0) + "%  " + usedFraction;
 
-                var queue_name = $('<td>').addClass('bar').text(item.id);
+                // var queue_name = | (Experimental Queue)"
+                // if(queue_names_clean[item.id])
+                //     queue_name = item.id + " (" + queue_names_clean[item.id] + ")";
 
-                var utilization = $('<td>').text(utilizationMsg);
-                if (utilizationPercentage < .60)
-                    utilization.addClass('label-success')
-                else if (utilizationPercentage < 1)
-                    utilization.addClass('label-warning')
+
+                var queue_name = queue_names_clean[item.id] || 'Experimental Queue';
+
+                var queue_name_full = $('<p>').text(queue_name).css({'font-size': 'medium', 'font-weight': 'bold'});
+                var queue_name_sub = $('<p>').text("(" + item.id + ")").css('font-size', 'small');
+
+                var queue_name_combined = $('<td>').append(queue_name_full).append(queue_name_sub);
+
+
+                var queued = $('<td>').text(item.Idle);
+                var held = $('<td>').text(item.Held);
+
+                var custom = $('<td>');
+                var message = $('<span>').text(utilizationMsg).css('font-size', 'medium').css('padding', '5px').css('text-shadow', '2px 2px 10px #000000');
+                //.css('text-align','center').css('position', 'absolute');
+
+
+                var available = true;
+
+                var color = 'progress-bar-success';
+
+                if (utilizationPercentage === 1)
+                    color = 'progress-bar-danger';
+                else if (utilizationPercentage > .6)
+                    color = 'progress-bar-warning';
+
+                //Fix formatting
+                if (utilizationPercentage !== 1)
+                    message.css('position', 'absolute');
+
+
+                if (utilizationPercentage === 0)
+                    message.css('color', 'black');
+
+
+                var progressBar = $('<div>').addClass('progress-bar').addClass(color)
+
+                    .attr('role', 'progressbar')
+                    .attr('aria-valuenow', utilizationPercentage * 100)
+                    .attr('aria-valuemin', '0')
+                    .attr('aria-valuemax', '100')
+                    .css('text-shadow', '1px 1px 2px #000000')
+                    .width(utilizationPercentage * 100 + "%")
+                    .append(message);
+
+                if (item.used_slots === undefined || item.total_slots === undefined || usedFraction === "(0/0)") {
+                    progressBar.text("Resource Unavailable")
+                        .width("100%")
+                        .addClass('progress-bar-danger')
+                        .css('font-size', 'medium')
+                    available = false;
+                }
+
+                if (queue_name === 'Experimental Queue')
+                    available = false;
+
+
+                var progress = $('<div>').addClass('progress').append(progressBar).height('30px');
+                custom.append(progress);
+                row.append([queue_name_combined, custom, queued,]);
+                if (self.isAdmin)
+                    row.append(held)
+
+                if (available)
+                    available_rows.push(row);
                 else
-                    utilization = $('<td>').addClass('label-danger').text("100% " + usedFraction);
-
-                if (item.used_slots === undefined || item.total_slots === undefined)
-                    utilization = $('<td>').addClass('label-danger').text("Queue unavailable");
-
-
-                var queued = $('<td>').text(item.Held);
-                var held = $('<td>').text(item.Idle);
-                row.append([queue_name, utilization, queued, held]);
-
-
-                table.append(row);
+                    unavailable_rows.push(row);
             });
 
 
+            for (var row in available_rows)
+                table.append(available_rows[row]);
+
+
+            var table2 = $('<table>').css('table-layout', 'fixed').addClass('table').attr('style', 'font-size: medium !important');
+            table2
+                .append($('<th>').text('Experimental Queues ').width('250px').css('font-size', 'x-large'))
+                .append($('<th>').text('Utilization Percentage').width('400px').css('font-size', 'x-large'))
+                .append($('<th>').text('# Queued').width('250px').css('font-size', 'x-large'))
+                .append($('<th>').text('# Held').width('250px').css('font-size', 'x-large')
+                );
+            table2.attr('id', 'demo').addClass('collapse');
+
+
+            for (var row in unavailable_rows)
+                table2.append(unavailable_rows[row]);
+
+
+            var animationInterval = setInterval(function () {
+                myTimer()
+            }, 1);
+            var count = 0;
+
+            function myTimer() {
+                if (count < 100) {
+                    $('.progress').css('width', count + "%");
+                    count += .75;
+                }
+                else {
+                    // clearInterval(animationInterval);
+                }
+
+            }
+
+            //This is probably a blocking operation?
+            var $refreshButton = $('<button>')
+                .addClass('btn btn-default')
+                .on('click', function (e) {
+                    var loadingCalls = [];
+                    self.showLoading();
+                    self.$basicStatsDiv.empty();
+                    loadingCalls.push(self.getQueueStatus());
+                    loadingCalls.push(self.getJobStats());
+                    // when we have it all, then render the list
+                    Promise.all(loadingCalls).then(function () {
+                        self.render();
+                        self.hideLoading();
+                    });
+
+                })
+                .attr('title', 'Refresh queue status')
+                .append($.jqElem('i').addClass('fa fa-refresh'));
+
+
+            var collapseButton = $("<button>").addClass('btn').addClass('btn-info').text("Show other queues");
+            collapseButton.attr('data-target', '#demo');
+            collapseButton.attr('data-toggle', 'collapse');
+
+
+            // $basicQueueStatsContainer.append(collapseButton);
+            // $basicQueueStatsContainer.append($refreshButton);
             $basicQueueStatsContainer.append(table);
 
 
-            var $container = $('<div>').addClass('container-fluid')
+            $basicQueueStatsContainer.append(table2);
+
+
+            var $container = $('<div>')//.addClass('container-fluid')
                 .append($('<div>').addClass('row')
-                    .append($('<div>').addClass('col-md-12')
-                        .append('<h4>Queue Status:</h4>')
-                        .append($basicQueueStatsContainer)));
+                    .append($('<div>').addClass('col-md-10')
+
+                        .append('<h2>Overview of the KBase Job Queue:</h2>')
+                        .append('<h6>Last updated: ' + self.jobStatsCreated + '. Learn more about our queues  <a href="https://kbase.github.io/kb_sdk_docs/references/execution_engine.html">here</a></h6>')
+                    )
+                    .append($('<div>').addClass('col-md-2').append(collapseButton).append($refreshButton))
+                )
+                .append($('<div>').addClass('row')
+                    .append($('<div>').addClass('col-md-12').append($basicQueueStatsContainer)));
 
 
             if (self.options.appendQueueStatusTable) {
                 self.$basicStatsDiv.append($container);
             }
-
-
-            //
-            // var basicQueueStatsConfig = {
-            //     rowsPerPage: 50,
-            //     headers: [
-            //         {text: 'Queue Name', id: 'id', isSortable: true},
-            //         {text: 'Free Slots', id: 'free_slots', isSortable: true},
-            //         {text: 'Total Slots', id: 'total_slots', isSortable: true},
-            //         {text: 'Used Slots', id: 'used_slots', isSortable: true},
-            //         {text: 'Held', id: 'Held', isSortable: true},
-            //         {text: 'Running', id: 'Running', isSortable: true},
-            //         {text: 'Queued', id: 'Idle', isSortable: true},
-            //
-            //     ],
-            // };
-            //
-            // var queueStatsRestructuredRows = self.restructureRows(basicQueueStatsConfig, self.queueStats);
-            //
-            // new DynamicTable($basicQueueStatsContainer,
-            //     {
-            //         headers: basicQueueStatsConfig.headers,
-            //         rowsPerPage: basicQueueStatsConfig.rowsPerPage,
-            //         enableDownload: false,
-            //         updateFunction: self.createDynamicUpdateFunction(basicQueueStatsConfig, queueStatsRestructuredRows)
-            //     }
-            // );
-            //
-            //
-            // var $container = $('<div>').addClass('container-fluid')
-            //     .append($('<div>').addClass('row')
-            //         .append($('<div>').addClass('col-md-12')
-            //             .append('<h4>Condor Queue Status:</h4>')
-            //             .append($basicQueueStatsContainer)));
-            //
-            // if (self.options.appendQueueStatusTable) {
-            //     self.$basicStatsDiv.append($container);
-            // }
-            //
-            // var $basicQueueStatsContainer2 = $('<div>').css('width', '100%');
 
 
         },
@@ -487,19 +644,20 @@ define([
                 .then(function (data) {
                     self.queueStats = [];
                     data = data[0];
-
-                    $.each(data, function (key, value) {
-                        if (jQuery.type(value) == 'object') {
-                            value.id = key;
-                            for (var k in value) {
-                                //Fix for zero values not being rendered as a numeric type
-                                // value[k] = value[k].toString();
+                    if (data) {
+                        $.each(data, function (key, value) {
+                            if (jQuery.type(value) == 'object') {
+                                value.id = key;
+                                for (var k in value) {
+                                    //Fix for zero values not being rendered as a numeric type
+                                    // value[k] = value[k].toString();
+                                }
+                                if (key != 'unknown')
+                                    self.queueStats.push(value);
                             }
-                            if (key != 'unknown')
-                                self.queueStats.push(value);
-                        }
-                    });
-                    self.queueStats = self.queueStats.sort(compare);
+                        });
+                        self.queueStats = self.queueStats.sort(compare);
+                    }
                 })
                 .catch(function (err) {
                     console.error('ERROR retrieving condor queue stats:');
@@ -519,45 +677,64 @@ define([
             return self.condor_statsClient.callFunc('job_status', [{}])
                 .then(function (data) {
                     self.jobStats = [];
+                    self.myJobStats = [];
 
-                    self.jobStatsCreated = new Date((data[0].created) + " UTC").toLocaleString();
+                    self.jobStatsCreated = new Date((data[0].created) + " UTC").toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
 
                     var rows = data[0].rows;
-                    $.each(rows, function (key, value) {
+                    var row_count = 0
 
-                        if (jQuery.type(value) == 'object') {
-                            if (value.JobBatchName)
-                                value.id = value.JobBatchName;
-                            else
-                                value.id = 'unknown';
+                    if (rows) {
+                        $.each(rows, function (key, value) {
 
-                            //Fix for zero values not being rendered as a numeric type
-                            //Add formatting
-                            for (var k in value) {
-                                //TODO SPEED THIS UP BY MAKING JSON A STRING IN THE SERVICE ITSELF
-                                value[k] = value[k].toString();
-                                value[k] = (value[k].length > 0) ? value[k] : '-';
-                                if (k == "JobStatusHuman") {
-                                    value[k] = self.labelJob(value[k]);
+                            if (jQuery.type(value) == 'object') {
+                                if (value.JobBatchName)
+                                    value.id = value.JobBatchName;
+                                else
+                                    value.id = 'unknown';
+
+                                //Fix for zero values not being rendered as a numeric type
+                                //Add formatting
+                                for (var k in value) {
+                                    //TODO SPEED THIS UP BY MAKING JSON A STRING IN THE SERVICE ITSELF
+                                    value[k] = value[k].toString();
+                                    value[k] = (value[k].length > 0) ? value[k] : '-';
+                                    if (k === "JobStatusHuman") {
+                                        value[k] = self.labelJob(value[k]);
+                                    }
+                                    if (k === "QDateHuman") {
+                                        value['QDateHuman'] = new Date((value[k]) + " UTC").toLocaleString();
+                                        ;
+                                    }
+                                    //TODO MOVE THIS INTO THE SERVICE MAYBE
+                                    if (k === "JobsAhead") {
+                                        var jh = value['JobsAhead'];
+                                        if (jh != '0')
+                                            value['JobsAhead'] = jh + " (" + value['CLIENTGROUP'] + ")";
+
+                                    }
+                                    //Sometimes kb_app_id is null
+                                    if (k === 'kb_app_id') {
+                                        if (value[k] === "null") {
+                                            value[k] += "(" + value['kb_function_name'] + ")";
+                                        }
+                                    }
+
                                 }
-                                if (k == "QDateHuman") {
-                                    value['QDateHuman'] = new Date((value[k])).toLocaleString();
-                                    ;
-                                }
-                                //TODO MOVE THIS INTO THE SERVICE MAYBE
-                                if (k == "JobsAhead") {
-                                    var jh = value['JobsAhead'];
-                                    if (jh != '0')
-                                        value['JobsAhead'] = jh + " (" + value['CLIENTGROUP'] + ")";
-                                    ;
+                                if (value['AcctGroup'] === self.me) {
+                                    self.myJobStats.push(row_count);
+                                    console.log("pushing" + value['AcctGroup'] + row_count);
                                 }
 
+
+                                self.jobStats.push(value);
+                                row_count++;
                             }
-
-
-                            self.jobStats.push(value);
-                        }
-                    });
+                        });
+                    }
                 })
                 .catch(function (err) {
                     console.error('ERROR retrieving condor job stats:');
@@ -565,9 +742,35 @@ define([
                 });
         },
 
+        getRefreshButton: function () {
+            //This is probably a blocking operation?
+
+            var self = this;
+
+            var button = $('<button>')
+                .addClass('btn btn-default')
+                .on('click', function (e) {
+                    var loadingCalls = [];
+                    self.showLoading();
+                    self.$basicStatsDiv.empty();
+                    loadingCalls.push(self.getQueueStatus());
+                    loadingCalls.push(self.getJobStats());
+                    // when we have it all, then render the list
+                    Promise.all(loadingCalls).then(function () {
+                        self.render();
+                        self.hideLoading();
+                    });
+
+                })
+                .attr('title', 'Refresh jobs data')
+                .append($.jqElem('i').addClass('fa fa-refresh'));
+
+            return button;
+        },
+
         checkIsAdmin: function () {
             var self = this;
-            self.isAdmin = true;
+            self.isAdmin = false
 
             var me = self.runtime.service('session').getUsername();
             self.me = me;

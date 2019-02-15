@@ -453,7 +453,11 @@ define([
                                 self.reformatIntervalInTD($row.children().eq(7));
 
                             }
+
+                            //Get job id for queued or running jobs
                             var job_id = $jobLogButton.data('log-job-id');
+                            if (job_id === undefined)
+                                job_id = $jobCancelButton.data('cancel-job-id');
 
                             /* The Status field has a button which'll show the job log. This wires it up to do so.
                                    Note that it cheats out the ass - it'll manually append a new row to the table, which is outside
@@ -874,8 +878,8 @@ define([
                         job.result += ' <button class="btn btn-default btn-xs" data-log-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
-                    if (job.exec_start_time && !job.finish_time && !job.error) {
-                      job.result += ' <button class="btn btn-danger btn-xs" data-cancel-job-id="' + job.job_id + '"> <i class="fa fa-ban"></i></button>';
+                    if ( !job.finish_time && !job.error) {
+                      job.result += ' <button class="btn btn-danger btn-xs" data-cancel-job-id="' + job.job_id + '"><i class="fa fa-ban"></i></button>';
                     }
 
                     job.result = '<span style="white-space : nowrap">' + job.result + '</span>';
