@@ -224,25 +224,24 @@ define([
 
 
         //This function is used to render queue stats from the condor_status service
-        renderJobStats: function (me) {
+        renderJobStats: function (singleUserMode) {
             var self = this;
 
-            if (self.jobStats == null) {
-                var $basicJobStatsContainer = $('<div>').css('width', '100%');
-                console.log("Job stats not found");
 
-                var $container = $('<div>')//.addClass('container-fluid')
-                    .append(row)
-                    .append($basicJobStatsContainer);
+            //TODO ADD CASE FOR UNAUTHENTICATED
 
-
-                if (self.options.appendJobStatusTable) {
-                    self.$basicStatsDiv.append("<h4>Queue status currently unavailable</h4>");
-                }
-
+            if(self.jobStats == null){
+                self.$basicStatsDiv.append($("<h3>").addClass('label label-warning').text("Queue status not available."));
+                self.$basicStatsDiv.append($("<hr>"));
                 return;
-
             }
+            if(singleUserMode && !self.myJobStats.length){
+                 self.$basicStatsDiv.append($("<h3>").addClass('label label-warning').text("You have no queued or running jobs."));
+                 self.$basicStatsDiv.append($("<hr>"));
+                 return;
+            }
+
+
 
 
             // var imp = "<script src='https://rawgit.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.js'></script>";
@@ -252,33 +251,64 @@ define([
             // $basicJobStatsContainer.append(imp);
 
 
-            var basicJobStatsConfig = {
-                rowsPerPage: 50,
-                headers: [
-                    {text: 'Username', id: 'AcctGroup', isSortable: true,},
-                    {text: 'KBase Job UUID', id: 'id', isSortable: true},
-                    {text: 'Job ID', id: 'ClusterId', isSortable: true, isResizeable: false},
-                    {text: 'kb_app_id', id: 'kb_app_id', isSortable: true},
-                    // {text: 'kb_function_name', id: 'kb_function_name', isSortable: true},
-                    // {text: 'kb_module_name', id: 'kb_module_name', isSortable: true},
-                    {text: 'RemoteHost', id: 'RemoteHost', isSortable: true},
-                    {text: 'Submission Time', id: 'QDateHuman', isSortable: true},
-                    {text: 'Job Status', id: 'JobStatusHuman', isSortable: true},
-                    {text: '# Jobs Ahead', id: 'JobsAhead', isSortable: true},
-                    {text: 'Queue', id: 'CLIENTGROUP', isSortable: true},
-                ],
-            };
+            // {text: 'kb_function_name', id: 'kb_function_name', isSortable: true},
+            // {text: 'kb_module_name', id: 'kb_module_name', isSortable: true},
+            // {text: 'RemoteHost', id: 'RemoteHost', isSortable: true},
 
-            // if (self.isAdmin) {
-            basicJobStatsConfig.headers.push({
-                text: 'Possible Issues *',
-                id: 'LastRejMatchReason',
-                isSortable: true
-            });
+
+            // if (self.isAdmin && !me) {
+            //     basicJobStatsConfig.headers.push(
+            //         {
+            //             text: 'Possible Issues *',
+            //             id: 'LastRejMatchReason',
+            //             isSortable: true
+            //         },
+            //         {text: 'RemoteHost', id: 'RemoteHost', isSortable: true}
+            //     );
             // }
 
+
+            var personalHeaders = [
+                {text: 'Username', id: 'AcctGroup', isSortable: true},
+                {text: 'KBase Job UUID', id: 'id', isSortable: true},
+                {text: 'Job ID', id: 'ClusterId', isSortable: true, isResizeable: true},
+                {text: 'kb_app_id', id: 'kb_app_id', isSortable: true},
+                {text: 'Submission Time', id: 'QDateHuman', isSortable: true},
+                {text: 'Job Status', id: 'JobStatusHuman', isSortable: true},
+                {text: '# Jobs Ahead', id: 'JobsAhead', isSortable: true},
+                {text: 'Queue', id: 'CLIENTGROUP', isSortable: true},
+                {text: 'Possible Issues *', id: 'LastRejMatchReason', isSortable: true}
+            ];
+
+            var allHeaders = [
+                {text: 'Username', id: 'AcctGroup', isSortable: true},
+                {text: 'kb_app_id', id: 'kb_app_id', isSortable: true},
+                {text: 'Submission Time', id: 'QDateHuman', isSortable: true},
+                {text: 'Queue', id: 'CLIENTGROUP', isSortable: true},
+                {text: 'Job Status', id: 'JobStatusHuman', isSortable: true},
+                {text: '# Jobs Ahead', id: 'JobsAhead', isSortable: true},
+
+            ];
+
+            if (self.isAdmin) {
+                allHeaders.splice(1, 0, {text: 'KBase Job UUID', id: 'id', isSortable: true});
+                allHeaders.splice(2, 0, {text: 'Job ID', id: 'ClusterId', isSortable: true, isResizeable: true});
+                allHeaders.splice(allHeaders.length, 0, {text: 'Possible Issues *', id: 'LastRejMatchReason', isSortable: true});
+
+            }
+
+            var basicJobStatsConfig = {
+                rowsPerPage: 50
+            };
+
+            if (singleUserMode)
+                basicJobStatsConfig.headers = personalHeaders;
+            else
+                basicJobStatsConfig.headers = allHeaders;
+
+
             var jobStats = [];
-            if (me) {
+            if (singleUserMode) {
                 for (var i in self.myJobStats) {
                     jobStats.push(self.jobStats[self.myJobStats[i]]);
                 }
@@ -300,10 +330,10 @@ define([
             );
 
             var title;
-            if (me)
-                title = "My Personal Job Stats (Last updated " + self.jobStatsCreated + ")"
+            if (singleUserMode)
+                title = "My Personal Job STATUS (Last updated " + self.jobStatsCreated + ")"
             else
-                title = "All Job Stats (Last updated " + self.jobStatsCreated + ")"
+                title = "All Jobs (Last updated " + self.jobStatsCreated + ")"
 
 
             //This is probably a blocking operation?
@@ -340,6 +370,7 @@ define([
             if (self.options.appendJobStatusTable) {
                 self.$basicStatsDiv.append(row.append($basicJobStatsContainer));
             }
+                self.$basicStatsDiv.append($("<hr>"));
         },
 
         //TODO BREAK INTO SMALLER FUNCTIONS ONCE FUNCTIONALITY AND LOOK IS APPROVED
@@ -535,12 +566,13 @@ define([
 
             var $container = $('<div>')//.addClass('container-fluid')
                 .append($('<div>').addClass('row')
-                    .append($('<div>').addClass('col-md-10')
+                    .append($('<div>').addClass('col-md-11')
 
                         .append('<h2>Overview of the KBase Job Queue:</h2>')
                         .append('<h6>Last updated: ' + self.jobStatsCreated + '. Learn more about our queues  <a href="https://kbase.github.io/kb_sdk_docs/references/execution_engine.html">here</a></h6>')
                     )
-                    .append($('<div>').addClass('col-md-2').append(collapseButton).append($refreshButton))
+                    .append($('<div>').addClass('col-md-1').append(collapseButton).append($refreshButton))
+                    .append($('<div>').addClass('col-md-1').append(collapseButton).append($refreshButton))
                 )
                 .append($('<div>').addClass('row')
                     .append($('<div>').addClass('col-md-12').append($basicQueueStatsContainer)));
@@ -549,6 +581,7 @@ define([
             if (self.options.appendQueueStatusTable) {
                 self.$basicStatsDiv.append($container);
             }
+            self.$basicStatsDiv.append($("<hr>"));
 
 
         },
