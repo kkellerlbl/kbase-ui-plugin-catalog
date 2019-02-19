@@ -162,8 +162,7 @@ define([
 
         checkIsAdmin: function () {
             var self = this;
-            var me = self.runtime.service('session').getUsername();
-            return self.catalog.is_admin(me)
+            return self.catalog.is_admin()
                 .then(function (result) {
                     if (result) { self.isAdmin = true; }
                 })
