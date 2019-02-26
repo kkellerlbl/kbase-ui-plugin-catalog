@@ -67,6 +67,10 @@ install:
             id: catalog_stats
             type: factory
         -
+            module: catalog_queue
+            id: catalog_queue
+            type: factory
+        -
             module: catalog_service
             id: catalog_service
             type: factory
@@ -174,6 +178,13 @@ install:
                 jqueryName: KBaseCatalogStats
             type: kbwidget
         -
+            module: widgets/kbaseCatalogQueue
+            id: catalog_queue_widget
+            title: App Catalog Queue
+            config:
+                jqueryName: KBaseCatalogQueue
+            type: kbwidget
+        -
             module: widgets/kbaseViewSDKRegistrationLog
             id: catalog_view_sdk_registration_log_widget
             title: App Catalog Module Registration Log
@@ -274,6 +285,9 @@ install:
         -
             path: ['catalog', 'admin']
             widget: catalog_admin
+        -
+            path: ['catalog', 'queue']
+            widget: catalog_queue
 
 
 
