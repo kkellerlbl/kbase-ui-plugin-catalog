@@ -291,7 +291,7 @@ define([
             if(!singleUserMode  && !self.isAdmin ){
                 jobStats = jobStats.filter(function(row){
                     return row['JobStatus'] !== '5';
-                })
+                });
             }
 
             var queueStatsRestructuredRows = self.restructureRows(basicJobStatsConfig, jobStats);
@@ -495,7 +495,8 @@ define([
                 .append($('<div>').addClass('row')
                     .append($('<div>').addClass('col-md-11')
                         .append(queue_title.append($refreshButton))
-                        .append('<h6>Last updated: ' + self.jobStatsCreated + '. Learn more about our queues  <a href=\'https://kbase.github.io/kb_sdk_docs/references/execution_engine.html\'>here</a></h6>')
+                        .append('<h6>Last updated: ' + self.jobStatsCreated +
+                        '.  <a href=\'https://kbase.github.io/kb_sdk_docs/references/execution_engine.html\' target=\'_blank\'>Learn more about our queues</a></h6>')
                     )
                 )
                 .append($('<div>').addClass('row')
