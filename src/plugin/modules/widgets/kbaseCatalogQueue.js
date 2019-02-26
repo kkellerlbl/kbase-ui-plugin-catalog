@@ -255,12 +255,12 @@ define([
             var self = this;
             var authenticated = true;
             if (self.jobStats == null) {
-                self.$basicStatsDiv.append($('<h3>').addClass('label label-warning').text('Queue status not available.'));
+                self.$basicStatsDiv.append($('<p>').addClass('label label-warning').text('Queue status not available.').css('font-size', 'large'));
                 self.$basicStatsDiv.append($('<hr>'));
                 authenticated = false;
             }
             if (singleUserMode && !self.userJobStatsPositions.length) {
-                self.$basicStatsDiv.append($('<h3>').addClass('label label-danger').text('You have no queued or running jobs.'));
+                self.$basicStatsDiv.append($('<p>').addClass('label label-danger').text('You have no queued or running jobs.').css('font-size', 'large'));
                 self.$basicStatsDiv.append($('<hr>'));
                 authenticated = false;
             }
@@ -444,23 +444,23 @@ define([
             var self = this;
 
             var normal_table = $('<table>').css('table-layout', 'fixed').addClass('table').attr('style', 'font-size: medium !important');
-            normal_table.append($('<th>').text('Queue Name').width('250px').css('font-size', 'x-large'))
-                .append($('<th>').text('Utilization Percentage (Used/Available)').width('400px').css('font-size', 'x-large'))
-                .append($('<th>').text('# Queued').width('250px').css('font-size', 'x-large'))
+            normal_table.append($('<th>').text('Queue Name').width('250px').css('font-size', 'large'))
+                .append($('<th>').text('Utilization (Used/Available)').width('400px').css('font-size', 'large'))
+                .append($('<th>').text('# Queued').width('250px').css('font-size', 'large'))
 
             if (self.isAdmin)
-                normal_table.append($('<th>').text('# Held').width('250px').css('font-size', 'x-large'))
+                normal_table.append($('<th>').text('# Held').width('250px').css('font-size', 'large'))
 
             var experimental_table = $('<table>').css('table-layout', 'fixed').addClass('table').attr('style', 'font-size: medium !important');
-            experimental_table.append($('<th>').text('Experimental Queues ').width('250px').css('font-size', 'x-large'))
-                .append($('<th>').text('Utilization Percentage (Used/Available)').width('400px').css('font-size', 'x-large'))
-                .append($('<th>').text('# Queued').width('250px').css('font-size', 'x-large'));
+            experimental_table.append($('<th>').text('Experimental Queues ').width('250px').css('font-size', 'large'))
+                .append($('<th>').text('Utilization Percentage (Used/Available)').width('400px').css('font-size', 'large'))
+                .append($('<th>').text('# Queued').width('250px').css('font-size', 'large'));
 
             if (self.isAdmin)
-                experimental_table.append($('<th>').text('# Held').width('250px').css('font-size', 'x-large'))
+                experimental_table.append($('<th>').text('# Held').width('250px').css('font-size', 'large'))
 
 
-            return {'normal_table': normal_table, 'experimental_table': experimental_table}
+            return {'normal_table': normal_table, 'experimental_table': experimental_table};
         },
 
         //Render the queue status tables, depending on whether or not the queues are available or not
