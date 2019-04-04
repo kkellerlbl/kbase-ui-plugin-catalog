@@ -122,6 +122,13 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                     this.channel.send('post-form', { action, params });
                 }
             });
+            this.runtime.messenger.receive({
+                channel: 'ui',
+                message: 'setTitle',
+                handler: (title) => {
+                    this.channel.send('set-title', { title });
+                }
+            });
         }
 
         setupDOMListeners() {

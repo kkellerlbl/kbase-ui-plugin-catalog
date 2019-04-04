@@ -1,4 +1,4 @@
-define(['kb_lib/html', './windowChannel', 'kb_lib/httpUtils'], function(html, WindowChannel, httpUtils) {
+define(['kb_lib/html', './windowChannel', 'kb_lib/httpUtils'], function (html, WindowChannel, httpUtils) {
     'use strict';
 
     var t = html.tag,
@@ -210,6 +210,10 @@ define(['kb_lib/html', './windowChannel', 'kb_lib/httpUtils'], function(html, Wi
 
             this.channel.on('clicked', () => {
                 window.document.body.click();
+            });
+
+            this.channel.on('set-title', ({ title }) => {
+                this.runtime.send('ui', 'setTitle', title);
             });
 
             this.channel.start();
