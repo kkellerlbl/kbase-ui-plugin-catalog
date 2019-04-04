@@ -1,0 +1,153 @@
+@font-face {
+    font-family: 'Oxygen';
+    src: url('./fonts/Oxygen-webfont.eot');
+    src: url('./fonts/Oxygen-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/Oxygen-webfont.woff') format('woff'), url('./fonts/Oxygen-webfont.ttf') format('truetype'),
+        url('./fonts/Oxygen-webfont.svg#OxygenRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Oxygen';
+    src: url('./fonts/Oxygen-Italic-webfont.eot');
+    src: url('./fonts/Oxygen-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/Oxygen-Italic-webfont.woff') format('woff'),
+        url('./fonts/Oxygen-Italic-webfont.ttf') format('truetype'),
+        url('./fonts/Oxygen-Italic-webfont.svg#OxygenItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Oxygen';
+    src: url('./fonts/Oxygen-Bold-webfont.eot');
+    src: url('./fonts/Oxygen-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/Oxygen-Bold-webfont.woff') format('woff'),
+        url('./fonts/Oxygen-Bold-webfont.ttf') format('truetype'),
+        url('./fonts/Oxygen-Bold-webfont.svg#OxygenBold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Oxygen';
+    src: url('./fonts/Oxygen-BoldItalic-webfont.eot');
+    src: url('./fonts/Oxygen-BoldItalic-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/Oxygen-BoldItalic-webfont.woff') format('woff'),
+        url('./fonts/Oxygen-BoldItalic-webfont.ttf') format('truetype'),
+        url('./fonts/Oxygen-BoldItalic-webfont.svg#OxygenBoldItalic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'OxygenMono';
+    src: url('./fonts/OxygenMono-Regular-webfont.eot');
+    src: url('./fonts/OxygenMono-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/OxygenMono-Regular-webfont.woff') format('woff'),
+        url('./fonts/OxygenMono-Regular-webfont.ttf') format('truetype'),
+        url('./fonts/OxygenMono-Regular-webfont.svg#OxygenMonoRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'RobotoBlack';
+    src: url('./fonts/Roboto-Black-webfont.eot');
+    src: url('./fonts/Roboto-Black-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/Roboto-Black-webfont.woff') format('woff'),
+        url('./fonts/Roboto-Black-webfont.ttf') format('truetype'),
+        url('./fonts/Roboto-Black-webfont.svg#RobotoBlack') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100%;
+    width: 100%;
+    font-size: 14px;
+    font-family: 'Oxygen', sans-serif;
+    flex: 1 1 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* H1 should only be used on the title area of the UI. The total height is 70px with 5px lower border, so the font size, 
+   padding, and margin are arranged to center it vertically within this height.*/
+
+.kbase-ui h1,
+.kbase-ui .h1 {
+    font-family: 'RobotoBlack', Arial, sans-serif;
+    letter-spacing: 0;
+    font-size: 29px;
+    padding: 5px 0px;
+    margin: 8px 0px;
+}
+
+/* H2 should be used for main panel titles. It may be used for the primary title for the panel, or if there 
+   are multiple sub-panels or areas, for each of them. */
+
+.kbase-ui h2,
+.kbase-ui .h2 {
+    font-family: 'RobotoBlack', Arial, sans-serif;
+    letter-spacing: 0;
+    font-size: 25px;
+}
+
+.kbase-ui h3,
+.kbase-ui .h3 {
+    font-family: 'RobotoBlack', Arial, sans-serif;
+    letter-spacing: 0;
+    font-size: 21px;
+}
+
+.kbase-ui h4,
+.kbase-ui .h4 {
+    font-family: 'RobotoBlack', Arial, sans-serif;
+    letter-spacing: 0em;
+    font-size: 19px;
+}
+
+.kbase-ui h5,
+.kbase-ui .h5 {
+    font-family: 'RobotoBlack', Arial, sans-serif;
+    letter-spacing: 0em;
+    font-size: 17px;
+}
+
+body.kbase-ui {
+    font-family: 'Oxygen', Arial, sans-serif;
+    color: #333333;
+}
+
+.panel-title {
+    /*color: #0072AF;*/
+    font-family: 'Oxygen', Arial, sans-serif;
+    font-weight: bold;
+}
+
+/* Safari fixes */
+
+div::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+div::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: #ececec;
+}
+
+div::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #666;
+}

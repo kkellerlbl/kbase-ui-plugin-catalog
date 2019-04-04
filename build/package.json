@@ -1,0 +1,33 @@
+{
+    "name": "kbase-ui-plugin-auth2-client",
+    "version": "0.1.0",
+    "description": "This repo contains a auth2-client",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/kbase/kbase-ui-plugin-auth2-client.git"
+    },
+    "author": "",
+    "license": "SEE LICENSE IN LICENSE",
+    "bugs": {
+        "url": "https://github.com/kbase/kbase-ui-plugin-auth2-client/issues"
+    },
+    "homepage": "https://github.com/kbase/kbase-ui-plugin-auth2-client#readme",
+    "dependencies": {},
+    "devDependencies": {
+        "bluebird": "3.5.3",
+        "bower-installer": "1.3.6",
+        "chalk": "2.4.2",
+        "fs-extra": "7.0.1",
+        "glob": "7.1.3",
+        "grunt": "1.0.4",
+        "grunt-contrib-copy": "1.0.0",
+        "grunt-cli": "1.3.2",
+        "js-yaml": "3.13.0",
+        "numeral": "2.0.6",
+        "pure-uuid": "1.5.7"
+    }
+}
