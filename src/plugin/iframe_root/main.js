@@ -180,13 +180,19 @@ require([
                         type: 'factory'
                     }
                 ];
-                dispatcher = new Dispatcher({ runtime: integration.runtime, node: rootNode, panels });
+                dispatcher = new Dispatcher({ runtime: integration.runtime, node: rootNode, views: panels });
                 return dispatcher.start();
             })
             .then((dispatcher) => {
                 integration.onNavigate(({ path, params }) => {
                     // TODO: ever
-                    const view = path[0];
+                    let view;
+                    if (params.view) {
+                        view = params.view;
+                    } else {
+                        view = path[0];
+                    }
+                    console.log('view?', params, path);
                     dispatcher.dispatch({ view, path, params });
                 });
                 integration.started();

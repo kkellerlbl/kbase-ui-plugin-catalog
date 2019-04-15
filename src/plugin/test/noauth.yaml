@@ -5,17 +5,26 @@
     specs:
         -
             description: should get the main view even without auth
-            baseSelector:
-                -
-                    type: plugin
-                    value: catalog
             tasks:
                 -
-                    title: 'Navigate to catalog main view'
+                    title: Navigate to catalog main view
                     navigate: 
                         path: appcatalog
                 -
-                    selector: []
-                    wait: 10000
+                    title: Switch to iframe
+                    switchToFrame:
+                        selector:
+                            - 
+                                type: iframe
+                                value: plugin-iframe
+                        wait: 1000
+                -
+                    selector: 
+                        type: absolute
+                        path:
+                            -
+                                type: plugin
+                                value: catalog
+                    wait: 1000
 
                         
