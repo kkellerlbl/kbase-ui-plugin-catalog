@@ -2,7 +2,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
     'use strict';
 
     class Integration {
-        constructor({ rootWindow }) {
+        constructor({ rootWindow, pluginConfig }) {
             this.rootWindow = rootWindow;
             this.container = rootWindow.document.body;
             // channelId, frameId, hostId, parentHost
@@ -11,6 +11,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
 
             // The original params from the plugin (taken from the url)
             this.pluginParams = this.hostParams.params;
+            this.pluginConfig = pluginConfig;
 
             this.authorized = null;
 
@@ -98,8 +99,9 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                 const { path, params } = message;
 
                 // TODO: proper routing to error page
-                if (!path || path.length === 0) {
-                    alert('no view provided...');
+                if ((!path || path.length === 0) && !params.view) {
+                    console.log('navigate?', message);
+                    alert('no view provided?...');
                     return;
                 }
 
@@ -131,19 +133,6 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             });
         }
 
-        setupDOMListeners() {
-            window.document.addEventListener('click', () => {
-                this.channel.send('clicked', {});
-            });
-            window.addEventListener('hashchange', () => {
-                const hash = window.location.hash;
-                const path = hash.substr(1);
-                this.channel.send('ui-navigate', {
-                    path
-                });
-            });
-        }
-
         started() {
             this.channel.send('started', {});
         }
@@ -171,7 +160,8 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                     this.runtime = new Runtime({
                         config,
                         token,
-                        username
+                        username,
+                        pluginConfig: this.pluginConfig
                     });
 
                     this.runtime
@@ -179,7 +169,6 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                         .then(() => {
                             this.setupListeners();
                             this.setupRuntimeListeners();
-                            this.setupDOMListeners();
                             resolve();
                         })
                         .catch((err) => {
@@ -240,6 +229,10 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                     //         callbackMessage: ['show-help', null]
                     //     }
                     // });
+                });
+
+                window.document.addEventListener('click', () => {
+                    this.channel.send('clicked', {});
                 });
 
                 // Sending 'ready' with our channel id and host name allows the

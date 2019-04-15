@@ -19,14 +19,14 @@ install:
         # Catalog Index
         # The catalog index is the view which lists additional catalog tools.
         - path: ['catalog', { type: literal, name: index, optional: true }]
-          queryParams:
-              path: { literal: ['catalogIndex'] }
+          params:
+              view: catalogIndex
           widget: kb_plugin_catalog
 
         # plain catalog/apps goes to the app browser
         - path: ['catalog', 'apps', { type: param, name: tag, optional: true }]
-          queryParams:
-              path: { literal: ['appsBrowser'] }
+          params:
+              view: appsBrowser
           widget: kb_plugin_catalog
 
         # App View
@@ -41,30 +41,30 @@ install:
                   { type: param, name: id },
                   { type: param, name: tag, optional: true },
               ]
-          queryParams:
-              path: { literal: ['appView'] }
+          params:
+              view: appView
           widget: kb_plugin_catalog
 
         # Module Browser and View
         - path: ['catalog', 'modules']
-          queryParams:
-              path: { literal: ['moduleBrowser'] }
+          params:
+              view: moduleBrowser
           widget: kb_plugin_catalog
         - path: ['catalog', 'modules', { type: param, name: module_name }]
-          queryParams:
-              path: { literal: ['moduleView'] }
+          param:
+              view: moduleView
           widget: kb_plugin_catalog
 
         # Dynamic Services Catalog
         - path: ['catalog', 'services']
-          queryParams:
-              path: { literal: ['serviceCatalog'] }
+          params:
+              view: serviceCatalog
           widget: kb_plugin_catalog
 
         # Functions browser and view
         - path: ['catalog', 'functions', { type: param, name: tag, optional: true }]
-          queryParams:
-              path: { literal: ['functionBrowser'] }
+          params:
+              view: functionBrowser
           widget: kb_plugin_catalog
         - path:
               [
@@ -74,8 +74,8 @@ install:
                   { type: param, name: function_id },
                   { type: param, name: ver, optional: true },
               ]
-          queryParams:
-              path: { literal: ['functionView'] }
+          params:
+              view: functionView
           widget: kb_plugin_catalog
 
         # Data Types Browser
