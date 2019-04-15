@@ -10,11 +10,11 @@ define(['require'], (require) => {
         });
     }
     class Dispatcher {
-        constructor({ node, runtime, panels }) {
+        constructor({ node, runtime, views }) {
             this.currentPanel = null;
             this.hostNode = node;
             this.runtime = runtime;
-            this.panels = panels;
+            this.views = views;
             this.viewMap = new Map();
         }
 
@@ -30,7 +30,7 @@ define(['require'], (require) => {
 
         start() {
             return Promise.all(
-                this.panels.map(({ module, view, type }) => {
+                this.views.map(({ module, view, type }) => {
                     return this.loadModule(module).then((module) => {
                         return { module, view, type: type || 'es6' };
                     });

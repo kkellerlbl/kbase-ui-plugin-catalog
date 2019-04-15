@@ -4,23 +4,31 @@
     description: Ensure the main view loads
     specs: 
         - 
-            baseSelector: 
-                - 
-                    type: plugin
-                    value: catalog
+            baseSelector: []
             description: Navigate to catalog main view
             tasks: 
                 - 
-                    subtask: dashboard
+                    subtask: login
                     title: login
                 - 
                     title: Navigate to app catalog main view
                     navigate: 
                         path: appcatalog
+                -
+                    title: Switch to iframe
+                    switchToFrame:
+                        selector:
+                            - 
+                                type: iframe
+                                value: plugin-iframe
+                        wait: 1000
                 - 
-                    title: Ensure that it loads within 10s
-                    selector: []
-                    wait: 10000
+                    title: Ensure that it loads within 1s
+                    selector: 
+                        - 
+                            type: plugin
+                            value: catalog
+                    wait: 1000
                 - 
                     subtask: logout
                     title: logout
