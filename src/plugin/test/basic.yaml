@@ -1,34 +1,15 @@
 # Basic test
 --- 
-- 
-    description: Ensure the main view loads
-    specs: 
-        - 
-            baseSelector: []
-            description: Navigate to catalog main view
-            tasks: 
-                - 
-                    subtask: login
-                    title: login
-                - 
-                    title: Navigate to app catalog main view
-                    navigate: 
-                        path: appcatalog
-                -
-                    title: Switch to iframe
-                    switchToFrame:
-                        selector:
-                            - 
-                                type: iframe
-                                value: plugin-iframe
-                        wait: 1000
-                - 
-                    title: Ensure that it loads within 1s
-                    selector: 
-                        - 
-                            type: plugin
-                            value: catalog
-                    wait: 1000
-                - 
-                    subtask: logout
-                    title: logout
+description: Ensure the main view loads
+specs: 
+  - baseSelector: []
+    description: Navigate to catalog main view
+    tasks: 
+      - subtask: login
+      - action: navigate
+        path: appcatalog
+      - subtask: plugin
+      - wait: forElement
+        selector: 
+          - type: plugin
+            value: catalog

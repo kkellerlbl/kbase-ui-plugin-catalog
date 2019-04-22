@@ -1,30 +1,15 @@
 # access without cookie
 ---
--
-    description: Unauthenticated
-    specs:
-        -
-            description: should get the main view even without auth
-            tasks:
-                -
-                    title: Navigate to catalog main view
-                    navigate: 
-                        path: appcatalog
-                -
-                    title: Switch to iframe
-                    switchToFrame:
-                        selector:
-                            - 
-                                type: iframe
-                                value: plugin-iframe
-                        wait: 1000
-                -
-                    selector: 
-                        type: absolute
-                        path:
-                            -
-                                type: plugin
-                                value: catalog
-                    wait: 1000
-
-                        
+description: Unauthenticated
+specs:
+  - description: should get the main view even without auth
+    tasks:
+      - action: navigate
+        path: appcatalog
+      - subtask: plugin
+      - wait: forElement
+        selector: 
+          type: absolute
+          path:
+            - type: plugin
+              value: catalog
