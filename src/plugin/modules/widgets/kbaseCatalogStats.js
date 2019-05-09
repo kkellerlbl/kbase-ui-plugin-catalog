@@ -862,7 +862,7 @@ define([
                     if (job.error) {
                         job.result = '<span class="label label-danger">Error</span>';
                     } else if (!job.finish_time) {
-                        job.result = job.exec_start_time
+                        job.result =  job.status === 'in-progress'
                             ? '<span class="label label-warning">Running</span>'
                             : '<span class="label label-warning">Queued</span>';
                     } else if (job.status === 'canceled by user') {
@@ -874,7 +874,7 @@ define([
 
                     // Creates a job log viewer button for any job which has been or is being
                     // run.
-                    if (job.exec_start_time) {
+                    if (job.exec_start_time || job.status === 'canceled by user' ) {
                         job.result += ' <button class="btn btn-default btn-xs" data-log-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
