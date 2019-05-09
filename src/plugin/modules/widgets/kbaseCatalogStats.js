@@ -874,7 +874,7 @@ define([
 
                     // Creates a job log viewer button for any job which has been or is being
                     // run.
-                    if (job.exec_start_time || job.status === 'canceled by user' ) {
+                    if (job.exec_start_time) {
                         job.result += ' <button class="btn btn-default btn-xs" data-log-job-id="' + job.job_id + '"> <i class="fa fa-file-text"></i></button>';
                     }
 
