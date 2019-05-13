@@ -862,7 +862,7 @@ define([
                     if (job.error) {
                         job.result = '<span class="label label-danger">Error</span>';
                     } else if (!job.finish_time) {
-                        job.result = job.exec_start_time
+                        job.result =  job.status === 'in-progress'
                             ? '<span class="label label-warning">Running</span>'
                             : '<span class="label label-warning">Queued</span>';
                     } else if (job.status === 'canceled by user') {
@@ -895,7 +895,7 @@ define([
                     }
 
                     // Calculate elapsed run time for finished and continuing jobs.
-                    if (job.exec_start_time) {
+                    if (job.exec_start_time && job.status !== 'queued') {
                         if (job.complete) {
                             job.run_time = job.modification_time - job.exec_start_time;
                         }  else {
@@ -908,7 +908,7 @@ define([
                     // Calculate elapsed queue time, for finished and continuing jobs.
                     // This just relies on the creation and start times.
                     if (job.creation_time) {
-                        if (job.exec_start_time) {
+                        if (job.exec_start_time && job.status !== 'queued') {
                             // For started jobs, the queue elapsed time is fixed.
                             job.queue_time = job.exec_start_time - job.creation_time;
                         } else {
