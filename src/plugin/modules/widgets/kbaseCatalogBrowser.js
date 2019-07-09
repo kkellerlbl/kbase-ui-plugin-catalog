@@ -1049,100 +1049,57 @@ define([
             this.$appListPanel.append($listContainer);
         },
 
-        renderbyInputTypes: function () {
-            // get and sort the type list
-            var types = [];
-            for (var k in this.inputTypes) {
-                types.push(k);
-            }
-            types.sort();
-
+        renderTypes: function (types, type_field) {
             // create the sections per type
-            var $typeDivLookup = {};
-            for (k = 0; k < types.length; k++) {
-                var $section = $('<div>').addClass('catalog-section');
-                var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
-                $typeDivLookup[types[k]] = $typeDiv;
+            let $typeDivLookup = {};
+            types.forEach((type) => {
+                const $section = $('<div>').addClass('catalog-section');
+                const $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
+                const url_prefix = type.includes(".") ? "type" : "module";
+                $typeDivLookup[type] = $typeDiv;
+
                 $section.append(
-                    $('<div>').css({ 'color': '#777' })
-                        .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
+                    $('<div>').append($('<h4>')
+                        .append($(`<a href="#spec/${url_prefix}/${type}">`).append(type))));
                 $section.append($typeDiv);
                 this.$appListPanel.append($section);
-            }
+            });
 
             // create section for apps without an input type
-            $section = $('<div>').addClass('catalog-section');
-            $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
+            const $section = $('<div>').addClass('catalog-section');
+            const $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $typeDivLookup.none = $typeDiv;
             $section.append(
-                $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append($('<span>None</span>').append(types[k]))));
+                $('<div>').css({'color': '#777'})
+                    .append($('<h4>').append($('<span>None</span>'))));
             $section.append($typeDiv);
             this.$appListPanel.append($section);
 
             // render the app list
-            for (k = 0; k < this.appList.length; k++) {
-                this.appList[k].clearCardsAddedCount();
-                if (this.appList[k].info.app_type === 'app') {
-                    if (this.appList[k].info.input_types.length > 0) {
-                        var input_types = this.appList[k].info.input_types;
-                        for (var i = 0; i < input_types.length; i++) {
-                            $typeDivLookup[input_types[i]].append(this.appList[k].getNewCardDiv());
-                        }
+            this.appList.forEach((app) => {
+                app.clearCardsAddedCount();
+                if (app.info.app_type === 'app') {
+                    if (app.info[type_field].length > 0) {
+                        app.info[type_field].forEach((type) => {
+                            $typeDivLookup[type].append(app.getNewCardDiv());
+                        });
                     } else {
-                        $typeDivLookup.none.append(this.appList[k].getNewCardDiv());
+                        $typeDivLookup.none.append(app.getNewCardDiv());
                     }
                 }
-            }
+            })
+        }, renderbyInputTypes: function () {
+            // get and sort the type list
+            const types = Object.keys(this.inputTypes).sort();
+            const type_field = "input_types";
+            this.renderTypes(types, type_field);
         },
 
         renderByOutputTypes: function () {
             // get and sort the type list
-            var types = [];
-            for (var k in this.outputTypes) {
-                types.push(k);
-            }
-            types.sort();
-
-            // create the sections per output type
-            var $typeDivLookup = {};
-            for (k = 0; k < types.length; k++) {
-                var $section = $('<div>').addClass('catalog-section');
-                var $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
-                $typeDivLookup[types[k]] = $typeDiv;
-                $section.append(
-                    $('<div>').css({ 'color': '#777' })
-                        .append($('<h4>').append($('<a href="#spec/type/' + types[k] + '">').append(types[k]))));
-                $section.append($typeDiv);
-                this.$appListPanel.append($section);
-            }
-
-
-            // create section for apps without an output type
-            $section = $('<div>').addClass('catalog-section');
-            $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
-            $typeDivLookup.none = $typeDiv;
-            $section.append(
-                $('<div>').css({ 'color': '#777' })
-                    .append($('<h4>').append($('<span>None</span>').append(types[k]))));
-            $section.append($typeDiv);
-            this.$appListPanel.append($section);
-
-            // render the app list
-            for (k = 0; k < this.appList.length; k++) {
-                this.appList[k].clearCardsAddedCount();
-
-                if (this.appList[k].info.app_type === 'app') {
-                    if (this.appList[k].info.output_types.length > 0) {
-                        var output_types = this.appList[k].info.output_types;
-                        for (var i = 0; i < output_types.length; i++) {
-                            $typeDivLookup[output_types[i]].append(this.appList[k].getNewCardDiv());
-                        }
-                    } else {
-                        $typeDivLookup.none.append(this.appList[k].getNewCardDiv());
-                    }
-                }
-            }
+            const types = Object.keys(this.outputTypes).sort();
+            const type_field = "output_types";
+            this.renderTypes(types, type_field);
         },
 
         renderByRuns: function () {
