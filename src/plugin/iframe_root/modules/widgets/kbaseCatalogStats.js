@@ -513,13 +513,16 @@ define([
                             if (window.confirm('Really cancel job?')) {
                                 self.njs
                                     .cancel_job({ job_id: job_id })
-                                    .then(function (res) {
+                                    .then(function () {
                                         /* We don't really care on success or failure. Just blissfully assume all is well on the njs side and ignore it.
                                        There may be valid things to put in here. Maybe have it automatically refresh? That may be jarring to the user. */
                                     })
-                                    .catch(function (err) {});
-                            } else {
-                                console.log('SAVED');
+                                    .catch(function (err) {
+                                        console.error('ERROR canceling job', err);
+                                        // TODO: there are error conditions which result in the job being canceled but still returning
+                                        // an error. I cannot replicate at the moment, and prod is slammed (slow) right now
+                                        // window.alert('Error canceling job: ' + err.message);
+                                    });
                             }
                         });
 
@@ -927,9 +930,13 @@ define([
                         if (job.error) {
                             job.result = '<span class="label label-danger">Error</span>';
                         } else if (!job.finish_time) {
-                            job.result = job.exec_start_time
+                            job.result = ['in-progress', 'running'].includes(job.status)
                                 ? '<span class="label label-warning">Running</span>'
                                 : '<span class="label label-warning">Queued</span>';
+                            //             job.result =
+                            // typeof job.status === 'undefined' || job.status === 'queued'
+                            //     ? '<span class="label label-warning">Queued</span>'
+                            //     : '<span class="label label-warning">Running</span>';
                         } else if (job.status === 'canceled by user') {
                             job.result = '<span class="label label-info">Canceled</span>';
                         } else {
@@ -973,7 +980,7 @@ define([
                         }
 
                         // Calculate elapsed run time for finished and continuing jobs.
-                        if (job.exec_start_time) {
+                        if (job.exec_start_time && job.status !== 'queued') {
                             if (job.complete) {
                                 job.run_time = job.modification_time - job.exec_start_time;
                             } else {
@@ -986,12 +993,25 @@ define([
                         // Calculate elapsed queue time, for finished and continuing jobs.
                         // This just relies on the creation and start times.
                         if (job.creation_time) {
-                            if (job.exec_start_time) {
-                                // For started jobs, the queue elapsed time is fixed.
-                                job.queue_time = job.exec_start_time - job.creation_time;
-                            } else {
-                                // Otherwise, relative to now.
+                            // Creation time is considered queue start time.
+                            // If queued, the elapsed time (job.queue_time) is calculated against
+                            // the current time, otherwise it is against the job start time (exec_start_time).
+                            if (typeof job.status === 'undefined' || job.status === 'queued') {
+                                // This is the "normal" queued detection; the job status field is
+                                // sometimes not populated when a job first starts, but we consider
+                                // that to be queued.
                                 job.queue_time = Date.now() - job.creation_time;
+                            } else if (job.exec_start_time) {
+                                // Job ran, so queued elapsed time is that between job creation (queue) time
+                                // and the job start time.
+                                job.queue_time = job.exec_start_time - job.creation_time;
+                            } else if (job.finish_time) {
+                                // This is the case when a job is canceled before it is run; there is no job start time,
+                                // so we use the finish time, which is stamped when the job is canceled.
+                                job.queue_time = job.finish_time - job.creation_time;
+                            } else {
+                                // should never get here
+                                job.queue_time = null;
                             }
                         } else {
                             this.queue_time = null;
