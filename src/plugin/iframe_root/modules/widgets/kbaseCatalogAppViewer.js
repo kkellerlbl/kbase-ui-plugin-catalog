@@ -1015,17 +1015,18 @@ define([
                     $paramList.append($li);
 
                     $.each(sortedParams[ui_class], function (idx, param) {
-                        var types = '';
+                        let types = '';
 
                         if (param.text_options && param.text_options.valid_ws_types) {
                             types = $.jqElem('i').append(' ');
-                            for (var ty = 0; ty < param.text_options.valid_ws_types.length; ty++) {
+                            for (let ty = 0; ty < param.text_options.valid_ws_types.length; ty++) {
                                 if (ty > 0) {
                                     types.append(', ');
                                 }
-                                var typeName = param.text_options.valid_ws_types[ty];
+                                const typeName = param.text_options.valid_ws_types[ty];
+                                const url_prefix = typeName.includes('.') ? 'type' : 'module';
                                 types.append(
-                                    '<a href="/#spec/type/' + typeName + '" target="_parent">' + typeName + '</a>'
+                                    `<a href="#spec/${url_prefix}/${typeName}" target="_parent">${typeName}</a>`
                                 );
                             }
                         }
