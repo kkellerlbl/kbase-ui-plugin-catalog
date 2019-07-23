@@ -23,7 +23,7 @@ install:
               view: catalogIndex
           widget: kb_plugin_catalog
 
-        # plain catalog/apps goes to the app browser
+        # plain catalog/apps with optional tag goes to the app browser
         - path: ['catalog', 'apps', { type: param, name: tag, optional: true }]
           params:
               view: appsBrowser
@@ -51,7 +51,7 @@ install:
               view: moduleBrowser
           widget: kb_plugin_catalog
         - path: ['catalog', 'modules', { type: param, name: module_name }]
-          param:
+          params:
               view: moduleView
           widget: kb_plugin_catalog
 
@@ -80,8 +80,8 @@ install:
 
         # Data Types Browser
         - path: ['catalog', 'datatypes']
-          queryParams:
-              path: { literal: ['datatypeBrowser'] }
+          params:
+              view: datatypeBrowser
           widget: kb_plugin_catalog
 
         # Developer Tools
@@ -90,24 +90,24 @@ install:
 
         # TODO: make sure it works.
         - path: ['catalog', 'register', { type: param, name: registration_id }]
-          queryParams:
-              path: { literal: ['catalogRegistration'] }
+          params:
+              view: catalogRegistration
           widget: kb_plugin_catalog
         - path: ['catalog', 'stats']
-          queryParams:
-              path: { literal: ['catalogStats'] }
+          params:
+              view: catalogStats
           widget: kb_plugin_catalog
         - path: ['catalog', 'status', { type: param, name: module_names, optional: true }]
-          queryParams:
-              path: { literal: ['catalogStatus'] }
+          params:
+              view: catalogStatus
           widget: kb_plugin_catalog
         - path: ['catalog', 'admin']
-          queryParams:
-              path: { literal: ['catalogAdmin'] }
+          params:
+              view: catalogAdmin
           widget: kb_plugin_catalog
         - path: ['catalog', 'queue']
-          queryParams:
-              path: { literal: ['catalogQueue'] }
+          params:
+              view: catalogQueue
           widget: kb_plugin_catalog
 
         # OLD ROUTES
@@ -115,18 +115,64 @@ install:
         # For now, let's just keep the root appcatalog. The rest of the routes
         # (see the old config.yml) are duplicates of most of the above, and i would bet
         # that the vast majority of links to them are generated right here in this
-        # plugin. In other words
+        # plugin.
+        # Well, the narrative, at least uses appcatalog links.
         #
         # App Browser
         # The normal user "home page" for the catalog is the app browser
+        # A variant of above (is the above even used?)
+
         - path:
               [
                   'appcatalog',
                   { type: literal, name: browse, optional: true },
                   { type: param, name: tag, optional: true },
               ]
-          queryParams:
-              path: { literal: ['appsBrowser'] }
+          params:
+              view: appsBrowser
+          widget: kb_plugin_catalog
+
+        - path: ['appcatalog', { type: literal, name: module }, { type: param, name: module_name, optional: true }]
+          params:
+              view: moduleView
+          widget: kb_plugin_catalog
+
+        - path:
+              [
+                  'appcatalog',
+                  'app',
+                  { type: param, name: namespace },
+                  { type: param, name: id },
+                  { type: param, name: tag, optional: true },
+              ]
+          params:
+              view: appView
+          widget: kb_plugin_catalog
+
+        # Different from the 'catalog' version because the registration id is otional
+        - path: ['appcatalog', 'register', { type: param, name: registration_id, optional: true }]
+          params:
+              view: catalogRegistration
+          widget: kb_plugin_catalog
+
+        - path: ['appcatalog', 'status', { type: param, name: module_names, optional: true }]
+          params:
+              view: catalogStatus
+          widget: kb_plugin_catalog
+
+        - path: ['appcatalog', 'service']
+          params:
+              view: serviceCatalog
+          widget: kb_plugin_catalog
+
+        - path: ['appcatalog', 'admin']
+          params:
+              view: catalogAdmin
+          widget: kb_plugin_catalog
+
+        - path: ['appcatalog', 'stats']
+          params:
+              view: catalogStats
           widget: kb_plugin_catalog
 
     menu:
