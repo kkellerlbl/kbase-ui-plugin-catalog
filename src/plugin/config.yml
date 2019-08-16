@@ -89,7 +89,7 @@ install:
         # Registration view
 
         # TODO: make sure it works.
-        - path: ['catalog', 'register', { type: param, name: registration_id }]
+        - path: ['catalog', 'register', { type: param, name: registration_id, optional: true }]
           params:
               view: catalogRegistration
           widget: kb_plugin_catalog
