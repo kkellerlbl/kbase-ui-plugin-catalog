@@ -319,10 +319,10 @@ define(['jquery'], function ($) {
 
             $appDiv.on('click', function () {
                 if (info.git_commit_hash) {
-                    window.location.href =
-                        '#catalog/functions/' + info.module_name + '/' + info.function_id + '/' + info.git_commit_hash;
+                    window.parent.location.href =
+                        '/#catalog/functions/' + info.module_name + '/' + info.function_id + '/' + info.git_commit_hash;
                 } else {
-                    window.location.href = '#catalog/functions/' + info.module_name + '/' + info.function_id;
+                    window.parent.location.href = '/#catalog/functions/' + info.module_name + '/' + info.function_id;
                 }
             });
 

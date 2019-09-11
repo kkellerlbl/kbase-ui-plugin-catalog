@@ -1026,7 +1026,7 @@ define([
                                 const typeName = param.text_options.valid_ws_types[ty];
                                 const url_prefix = typeName.includes('.') ? 'type' : 'module';
                                 types.append(
-                                    `<a href="#spec/${url_prefix}/${typeName}" target="_parent">${typeName}</a>`
+                                    `<a href="/#spec/${url_prefix}/${typeName}" target="_parent">${typeName}</a>`
                                 );
                             }
                         }
@@ -1118,7 +1118,7 @@ define([
             $.each(self.$mainPanel.find('[data-method-id]'), function (idx, link) {
                 var method_id = $(link).data('method-id');
                 $(link).attr('target', '_blank');
-                $(link).attr('href', '#/narrativestore/method/' + method_id);
+                $(link).attr('href', '/#narrativestore/method/' + method_id);
             });
         }
     });
