@@ -437,17 +437,17 @@ define(['jquery'], function ($) {
                     if (info.module_name) {
                         // module name right now is encoded in the ID
                         if (linkTag) {
-                            window.location.href = '#catalog/apps/' + info.id + '/' + linkTag;
+                            window.parent.location.href = '/#catalog/apps/' + info.id + '/' + linkTag;
                         } else {
-                            window.location.href = '#catalog/apps/' + info.id;
+                            window.parent.location.href = '/#catalog/apps/' + info.id;
                         }
                     } else {
                         // legacy method, encoded as l.m
-                        window.location.href = '#catalog/apps/l.m/' + info.id;
+                        window.parent.location.href = '/#catalog/apps/l.m/' + info.id;
                     }
                 } else {
                     // apps still go to old style page
-                    window.location.href = '#narrativestore/app/' + info.id;
+                    window.parent.location.href = '/#narrativestore/app/' + info.id;
                 }
             });
 
