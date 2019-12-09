@@ -192,7 +192,6 @@ require([
                     } else {
                         view = path[0];
                     }
-                    console.log('view?', params, path);
                     dispatcher.dispatch({ view, path, params });
                 });
                 integration.started();
