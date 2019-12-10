@@ -1,23 +1,15 @@
-define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 'bluebird'], function (
-    require,
-    exports,
-    Cookie_1,
-    Auth2_1,
-    Auth2Error_1,
-    Utils_1,
-    Promise
-) {
-    'use strict';
-    Object.defineProperty(exports, '__esModule', { value: true });
+define(["require", "exports", "./Cookie", "./Auth2", "./Auth2Error", "./Utils", "bluebird"], function (require, exports, Cookie_1, Auth2_1, Auth2Error_1, Utils_1, Promise) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var CacheState;
     (function (CacheState) {
-        CacheState[(CacheState['New'] = 1)] = 'New';
-        CacheState[(CacheState['Ok'] = 2)] = 'Ok';
-        CacheState[(CacheState['Stale'] = 3)] = 'Stale';
-        CacheState[(CacheState['Syncing'] = 4)] = 'Syncing';
-        CacheState[(CacheState['Error'] = 5)] = 'Error';
-        CacheState[(CacheState['Interrupted'] = 6)] = 'Interrupted';
-        CacheState[(CacheState['None'] = 7)] = 'None';
+        CacheState[CacheState["New"] = 1] = "New";
+        CacheState[CacheState["Ok"] = 2] = "Ok";
+        CacheState[CacheState["Stale"] = 3] = "Stale";
+        CacheState[CacheState["Syncing"] = 4] = "Syncing";
+        CacheState[CacheState["Error"] = 5] = "Error";
+        CacheState[CacheState["Interrupted"] = 6] = "Interrupted";
+        CacheState[CacheState["None"] = 7] = "None";
     })(CacheState || (CacheState = {}));
     class Auth2Session {
         constructor(config) {
@@ -83,12 +75,12 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
             }
             return null;
         }
-        getKBaseSession() {
+        getKbaseSession() {
             var session = this.getSession();
             if (!session) {
                 return null;
             }
-            const info = session.tokenInfo;
+            let info = session.tokenInfo;
             return {
                 un: info.user,
                 user_id: info.user,
@@ -111,9 +103,11 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
             return this.auth2Client;
         }
         loginPick(arg) {
-            return this.auth2Client.loginPick(arg).then((result) => {
+            return this.auth2Client.loginPick(arg)
+                .then((result) => {
                 this.setSessionCookie(result.token.token, result.token.expires);
-                return this.evaluateSession().then(() => {
+                return this.evaluateSession()
+                    .then(() => {
                     return result;
                 });
             });
@@ -165,31 +159,35 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
             return this.auth2Client.getLinkChoice(this.getToken());
         }
         linkPick(identityId) {
-            return this.auth2Client.linkPick(this.getToken(), identityId).then((result) => {
+            return this.auth2Client.linkPick(this.getToken(), identityId)
+                .then((result) => {
                 return result;
             });
         }
         logout(tokenId) {
-            return this.auth2Client.logout(this.getToken()).then(() => {
+            return this.auth2Client.logout(this.getToken())
+                .then(() => {
                 this.removeSessionCookie();
                 return this.evaluateSession();
             });
         }
         revokeToken(tokenId) {
-            const that = this;
-            return this.getTokenInfo().then((tokenInfo) => {
+            let that = this;
+            return this.getTokenInfo()
+                .then((tokenInfo) => {
                 return this.auth2Client.revokeToken(this.getToken(), tokenId);
             });
         }
         revokeAllTokens() {
-            const that = this;
-            return this.getTokenInfo().then((tokenInfo) => {
+            let that = this;
+            return this.getTokenInfo()
+                .then((tokenInfo) => {
                 return this.auth2Client.revokeAllTokens(this.getToken());
             });
         }
         onChange(listener) {
-            const utils = new Utils_1.Utils();
-            const id = utils.genId();
+            let utils = new Utils_1.Utils();
+            let id = utils.genId();
             this.changeListeners[id] = listener;
             return id;
         }
@@ -201,20 +199,21 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                 return;
             }
             Object.keys(this.changeListeners).forEach((key) => {
-                const listener = this.changeListeners[key];
+                let listener = this.changeListeners[key];
                 try {
                     listener(change);
-                } catch (ex) {
+                }
+                catch (ex) {
                     console.error('Error running change listener', key, ex);
                 }
             });
         }
         checkSession() {
-            const cookieToken = this.getAuthCookie();
-            const currentSession = this.getSession();
-            const hadSession = currentSession ? true : false;
+            let cookieToken = this.getAuthCookie();
+            let currentSession = this.getSession();
+            let hadSession = currentSession ? true : false;
             var result = null;
-            const now = new Date().getTime();
+            let now = new Date().getTime();
             if (!cookieToken) {
                 if (this.sessionCache.session) {
                     this.sessionCache.session = null;
@@ -222,7 +221,8 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                     return {
                         status: 'loggedout'
                     };
-                } else {
+                }
+                else {
                     this.sessionCache.state = CacheState.None;
                     return {
                         status: 'nosession'
@@ -242,7 +242,7 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                     cookie: cookieToken
                 };
             }
-            const expiresIn = this.sessionCache.session.tokenInfo.expires - now;
+            let expiresIn = this.sessionCache.session.tokenInfo.expires - now;
             if (expiresIn <= 0) {
                 this.sessionCache.session = null;
                 this.sessionCache.state = CacheState.None;
@@ -250,11 +250,12 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                 return {
                     status: 'loggedout'
                 };
-            } else if (expiresIn <= 300000) {
+            }
+            else if (expiresIn <= 300000) {
             }
             if (this.sessionCache.state === CacheState.Interrupted) {
-                const interruptedFor = now - this.sessionCache.interruptedAt;
-                const checkedFor = now - this.sessionCache.lastCheckedAt;
+                let interruptedFor = now - this.sessionCache.interruptedAt;
+                let checkedFor = now - this.sessionCache.lastCheckedAt;
                 if (interruptedFor < 60000) {
                     if (checkedFor > 5000) {
                         return {
@@ -262,7 +263,8 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                             cookie: cookieToken
                         };
                     }
-                } else {
+                }
+                else {
                     if (checkedFor > 60000) {
                         return {
                             status: 'interrupted-retry',
@@ -275,7 +277,7 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                     cookie: cookieToken
                 };
             }
-            const sessionAge = now - this.sessionCache.fetchedAt;
+            let sessionAge = now - this.sessionCache.fetchedAt;
             if (sessionAge > this.sessionCache.session.tokenInfo.cachefor) {
                 this.sessionCache.state = CacheState.Stale;
                 return {
@@ -301,51 +303,47 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
             }
             var cookies = this.cookieManager.getItems(this.cookieName);
             if (cookies.length > 0) {
-                throw new Error(
-                    'Duplicate session cookie detected and cannot remove it. Please delete your browser cookies for this site.'
-                );
+                throw new Error('Duplicate session cookie detected and cannot remove it. Please delete your browser cookies for this site.');
             }
         }
         evaluateSession() {
             return Promise.try(() => {
-                const change = null;
-                const sessionState = this.checkSession();
+                let change = null;
+                let sessionState = this.checkSession();
                 switch (sessionState.status) {
-                case 'loggedout':
-                    this.notifyListeners('loggedout');
-                    return;
-                case 'ok':
-                    return;
-                case 'nosession':
-                    return;
-                case 'interrupted-retry':
-                case 'newtoken':
-                case 'cacheexpired':
-                    break;
-                default:
-                    throw new Error('Unexpected session state: ' + sessionState.status);
+                    case 'loggedout':
+                        this.notifyListeners('loggedout');
+                        return;
+                    case 'ok':
+                        return;
+                    case 'nosession':
+                        return;
+                    case 'interrupted-retry':
+                    case 'newtoken':
+                    case 'cacheexpired':
+                        break;
+                    default: throw new Error('Unexpected session state: ' + sessionState.status);
                 }
-                const cookieToken = sessionState.cookie;
+                let cookieToken = sessionState.cookie;
                 this.sessionCache.lastCheckedAt = new Date().getTime();
                 var tokenInfo;
                 var me;
-                return this.auth2Client
-                    .getTokenInfo(cookieToken)
+                return this.auth2Client.getTokenInfo(cookieToken)
                     .then((result) => {
-                        tokenInfo = result;
-                        return this.auth2Client.getMe(cookieToken);
-                    })
+                    tokenInfo = result;
+                    return this.auth2Client.getMe(cookieToken);
+                })
                     .then((result) => {
-                        me = result;
-                        this.sessionCache.fetchedAt = new Date().getTime();
-                        this.sessionCache.state = CacheState.Ok;
-                        this.sessionCache.interruptedAt = null;
-                        this.sessionCache.session = {
-                            token: cookieToken,
-                            tokenInfo: tokenInfo,
-                            me: me
-                        };
-                        switch (sessionState.status) {
+                    me = result;
+                    this.sessionCache.fetchedAt = new Date().getTime();
+                    this.sessionCache.state = CacheState.Ok;
+                    this.sessionCache.interruptedAt = null;
+                    this.sessionCache.session = {
+                        token: cookieToken,
+                        tokenInfo: tokenInfo,
+                        me: me
+                    };
+                    switch (sessionState.status) {
                         case 'newtoken':
                             this.notifyListeners('loggedin');
                             break;
@@ -353,10 +351,10 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                             this.notifyListeners('restored');
                             break;
                         case 'cacheexpired':
-                        }
-                    })
+                    }
+                })
                     .catch(Auth2Error_1.AuthError, (err) => {
-                        switch (err.code) {
+                    switch (err.code) {
                         case '10020':
                             console.error('Invalid Session Cookie Detected', err);
                             this.removeSessionCookie();
@@ -368,48 +366,50 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
                             this.sessionCache.interruptedAt = new Date().getTime();
                             this.notifyListeners('interrupted');
                             switch (sessionState.status) {
-                            case 'cacheexpired':
-                            case 'newtoken':
-                                this.sessionCache.fetchedAt = new Date().getTime();
-                                this.notifyListeners('interrupted');
-                                break;
-                            case 'interrupted-retry':
-                                this.notifyListeners('interrupted');
-                                break;
+                                case 'cacheexpired':
+                                case 'newtoken':
+                                    this.sessionCache.fetchedAt = new Date().getTime();
+                                    this.notifyListeners('interrupted');
+                                    break;
+                                case 'interrupted-retry':
+                                    this.notifyListeners('interrupted');
+                                    break;
                             }
                             break;
                         default:
                             console.error('Unhandled AUTH ERROR', err);
                             this.removeSessionCookie();
                             this.notifyListeners('loggedout');
-                        }
-                    })
+                    }
+                })
                     .catch((err) => {
-                        console.error('ERROR', err, err instanceof Auth2Error_1.AuthError);
-                        this.session = null;
-                        this.removeSessionCookie();
-                        if (sessionState === 'newtoken') {
-                            this.notifyListeners('loggedout');
-                        }
-                    });
+                    console.error('ERROR', err, err instanceof Auth2Error_1.AuthError);
+                    this.session = null;
+                    this.removeSessionCookie();
+                    if (sessionState === 'newtoken') {
+                        this.notifyListeners('loggedout');
+                    }
+                });
             });
         }
         serverTimeOffset() {
             return this.now - this.root.servertime;
         }
         start() {
-            return this.auth2Client.root().then((root) => {
+            return this.auth2Client.root()
+                .then((root) => {
                 this.root = root;
                 this.now = new Date().getTime();
                 return Promise.try(() => {
-                    const nextLoop = () => {
+                    let nextLoop = () => {
                         if (!this.serviceLoopActive) {
                             return;
                         }
                         this.loopTimer = window.setTimeout(serviceLoop, 1000);
                     };
-                    const serviceLoop = () => {
-                        return this.evaluateSession().then(() => {
+                    let serviceLoop = () => {
+                        return this.evaluateSession()
+                            .then(() => {
                             nextLoop();
                         });
                     };
@@ -428,16 +428,16 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
             });
         }
         setSessionCookie(token, expiration) {
-            const sessionCookie = new Cookie_1.Cookie(this.cookieName)
+            let sessionCookie = new Cookie_1.Cookie(this.cookieName)
                 .setValue(token)
                 .setPath('/')
                 .setSecure(true);
             sessionCookie.setExpires(new Date(expiration).toUTCString());
             this.cookieManager.setItem(sessionCookie);
-            const that = this;
+            let that = this;
             if (this.extraCookies) {
                 this.extraCookies.forEach((cookieConfig) => {
-                    const extraCookie = new Cookie_1.Cookie(cookieConfig.name)
+                    let extraCookie = new Cookie_1.Cookie(cookieConfig.name)
                         .setValue(token)
                         .setPath('/')
                         .setDomain(cookieConfig.domain);
@@ -447,18 +447,20 @@ define(['require', 'exports', './Cookie', './Auth2', './Auth2Error', './Utils', 
             }
         }
         removeSessionCookie() {
-            this.cookieManager.removeItem(new Cookie_1.Cookie(this.cookieName).setPath('/'));
-            const domainParts = window.location.hostname.split('.');
+            this.cookieManager.removeItem(new Cookie_1.Cookie(this.cookieName)
+                .setPath('/'));
+            let domainParts = window.location.hostname.split('.');
             var domain;
             for (var len = 2; len <= domainParts.length; len += 1) {
                 domain = domainParts.slice(-len).join('.');
-                this.cookieManager.removeItem(new Cookie_1.Cookie(this.cookieName).setPath('/').setDomain(domain));
+                this.cookieManager.removeItem(new Cookie_1.Cookie(this.cookieName)
+                    .setPath('/').setDomain(domain));
             }
             if (this.extraCookies) {
                 this.extraCookies.forEach((cookieConfig) => {
-                    this.cookieManager.removeItem(
-                        new Cookie_1.Cookie(cookieConfig.name).setPath('/').setDomain(cookieConfig.domain)
-                    );
+                    this.cookieManager.removeItem(new Cookie_1.Cookie(cookieConfig.name)
+                        .setPath('/')
+                        .setDomain(cookieConfig.domain));
                 });
             }
         }

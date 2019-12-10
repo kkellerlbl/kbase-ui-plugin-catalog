@@ -1,9 +1,4 @@
-define([
-    'bluebird',
-    './adapters/objectWidget',
-    './adapters/kbWidget',
-    '../merge'
-], function (
+define(['bluebird', './adapters/objectWidget', './adapters/kbWidget', '../merge'], function (
     Promise,
     objectWidgetAdapter,
     kbwidgetAdapter,
@@ -12,16 +7,11 @@ define([
     'use strict';
 
     class WidgetManager {
-        constructor(config) {
-            // TODO: get rid of this?
-            // if (!config.runtime) {
-            //     throw new Error('WidgetManager requires a runtime argument; pass as "runtime"')
-            // }
-            // this.runtime = config.runtime;
-            if (!config.baseWidgetConfig) {
-                throw new Error('WidgetManager requires a baseWidgetConfig argument; pass as "baseWidgetConfig"');
+        constructor({ runtime }) {
+            if (!runtime) {
+                throw new Error('WidgetManager requires a runtime argument; pass as "runtime"');
             }
-            this.baseWidgetConfig = config.baseWidgetConfig;
+            this.runtime = runtime;
 
             this.widgets = {};
         }
@@ -47,29 +37,27 @@ define([
                 if (widget.css) {
                     required.push('css!' + widget.module + '.css');
                 }
-                require(required,
-                    (factory) => {
-                        if (typeof factory === 'undefined') {
-                            // TODO: convert to real Error object
-                            reject({
-                                message: 'Factory widget maker is undefined for ' + widget.module,
-                                data: { widget: widget }
-                            });
-                            return;
-                        }
-                        if (factory.make === undefined) {
-                            reject('Factory widget does not have a "make" method: ' + widget.name + ', ' + widget.module);
-                            return;
-                        }
-                        try {
-                            resolve(factory.make(config));
-                        } catch (ex) {
-                            reject(ex);
-                        }
-                    },
-                    (error) => {
-                        reject(error);
-                    });
+                require(required, (factory) => {
+                    if (typeof factory === 'undefined') {
+                        // TODO: convert to real Error object
+                        reject({
+                            message: 'Factory widget maker is undefined for ' + widget.module,
+                            data: { widget: widget }
+                        });
+                        return;
+                    }
+                    if (factory.make === undefined) {
+                        reject('Factory widget does not have a "make" method: ' + widget.name + ', ' + widget.module);
+                        return;
+                    }
+                    try {
+                        resolve(factory.make(config));
+                    } catch (ex) {
+                        reject(ex);
+                    }
+                }, (error) => {
+                    reject(error);
+                });
             });
         }
 
@@ -79,30 +67,28 @@ define([
                 if (widget.css) {
                     required.push('css!' + widget.module + '.css');
                 }
-                require(required,
-                    (module) => {
-                        let Widget;
-                        if (module.Widget) {
-                            Widget = module.Widget;
-                        } else {
-                            Widget = module;
-                        }
-                        if (typeof Widget === 'undefined') {
-                            reject({
-                                message: 'Widget class is undefined for ' + widget.module,
-                                data: { widget: widget }
-                            });
-                            return;
-                        }
-                        try {
-                            resolve(new Widget(config));
-                        } catch (ex) {
-                            reject(ex);
-                        }
-                    },
-                    (error) => {
-                        reject(error);
-                    });
+                require(required, (module) => {
+                    let Widget;
+                    if (module.Widget) {
+                        Widget = module.Widget;
+                    } else {
+                        Widget = module;
+                    }
+                    if (typeof Widget === 'undefined') {
+                        reject({
+                            message: 'Widget class is undefined for ' + widget.module,
+                            data: { widget: widget }
+                        });
+                        return;
+                    }
+                    try {
+                        resolve(new Widget(config));
+                    } catch (ex) {
+                        reject(ex);
+                    }
+                }, (error) => {
+                    reject(error);
+                });
             });
         }
 
@@ -149,17 +135,15 @@ define([
                 throw new Error('Widget ' + widgetName + ' not found');
             }
 
-            let widgetPromise;
+            // TODO: do we really need to do this?
+            const widgetConfig = new merge.DeepMerger({}).mergeIn(config).value();
 
-            const configCopy = new merge.DeepMerger({}).mergeIn(config).value();
-            const widgetConfig = new merge.DeepMerger(configCopy).mergeIn(this.baseWidgetConfig).value();
+            widgetConfig.runtime = this.runtime;
 
             config = config || {};
-            // config.runtime = this.runtime;
-            // TODO: this is not wonderful...
-            // config =
 
             // How we create a widget depends on what type it is.
+            let widgetPromise;
             switch (widgetDef.type) {
             case 'factory':
                 widgetPromise = this.makeFactoryWidget(widgetDef, widgetConfig);
@@ -176,13 +160,12 @@ define([
             default:
                 throw new Error('Unsupported widget type ' + widgetDef.type);
             }
-            return widgetPromise
-                .then((widget) => {
-                    this.validateWidget(widget, widgetName);
-                    return widget;
-                });
+            return widgetPromise.then((widget) => {
+                this.validateWidget(widget, widgetName);
+                return widget;
+            });
         }
     }
 
-    return {WidgetManager};
+    return { WidgetManager };
 });

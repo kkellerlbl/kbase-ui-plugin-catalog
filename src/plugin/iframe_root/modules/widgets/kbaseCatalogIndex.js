@@ -4,7 +4,7 @@ define(['jquery', 'kb_service/client/catalog', 'kb_widget/legacy/authenticatedWi
 ) {
     'use strict';
 
-    var BASE = '/#catalog/';
+    const BASE = '/#catalog/';
 
     $.KBWidget({
         name: 'KBaseCatalogIndex',

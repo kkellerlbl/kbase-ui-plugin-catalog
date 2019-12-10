@@ -8,7 +8,8 @@ By hand:
 
 ```
 cd build
-npm install
+yarn install
 ./node_modules/.bin/bower-installer
 ./node_modules/.bin/grunt copy
+yarn remove-source-maps
 ```

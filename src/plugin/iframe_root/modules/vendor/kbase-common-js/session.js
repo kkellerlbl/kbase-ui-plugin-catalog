@@ -1,4 +1,11 @@
-define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
+define([
+    'jquery',
+    'bluebird',
+    './cookie'
+], function (
+    $,
+    Promise,
+    Cookie) {
     'use strict';
 
     function factory(cfg) {
@@ -60,6 +67,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
          *
          */
 
+
         /**
          * An object representation of the Globus authentication token.
          *
@@ -83,9 +91,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
             var parts = token.split('|'),
                 map = {},
                 i,
-                fieldParts,
-                key,
-                value;
+                fieldParts, key, value;
             for (i = 0; i < parts.length; i += 1) {
                 fieldParts = parts[i].split('=');
                 key = fieldParts[0];
@@ -149,9 +155,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
                 return false;
             }
 
-            if (
-                !(sessionObject.sessionId && sessionObject.username && sessionObject.token && sessionObject.tokenObject)
-            ) {
+            if (!(sessionObject.sessionId && sessionObject.username && sessionObject.token && sessionObject.tokenObject)) {
                 return false;
             }
 
@@ -233,7 +237,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
          *
          * @returns {KBaseSessionObject}
          */
-        function getKBaseSession() {
+        function getKbaseSession() {
             refreshSession();
             if (!sessionObject) {
                 return null;
@@ -277,7 +281,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
 
             // And any others set by third party code on this host only.
             // Note that this may leave cookies on the domain level, but since those
-            // cookies may be shared across kbase deployments, we shouldn't do that
+            // cookies may be shared across kbase deployments, we shouldn't do that 
             // until we have more control over cookie namespacing.
             cookies.forEach(function (cookie) {
                 cookieManager.removeItem(cookie.name, '/');
@@ -286,6 +290,8 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
 
             sessionObject = null;
         }
+
+
 
         /**
          * Attempt to set the internal session object from the given
@@ -424,6 +430,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
                 // upper case letters.
                 options.username = options.username.toLowerCase();
 
+
                 // NB: the cookie param determines whether the auth service will
                 // set a cookie or not. The cookie set only includes un and kbase_sessionid.
                 // It does not include the auth token, amazingly, which is required for all
@@ -537,6 +544,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
         }
         // Setup
 
+
         // API
 
         return {
@@ -550,7 +558,7 @@ define(['jquery', 'bluebird', './cookie'], function ($, Promise, Cookie) {
             isLoggedIn: isLoggedIn,
             importFromCookie: importFromCookie,
             setSession: setSession,
-            getKBaseSession: getKBaseSession
+            getKbaseSession: getKbaseSession
         };
     }
 

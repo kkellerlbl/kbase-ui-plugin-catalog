@@ -1,8 +1,4 @@
-define([
-    'uuid'
-], function (
-    Uuid
-) {
+define(['uuid'], function (Uuid) {
     'use strict';
 
     class Listener {
@@ -91,7 +87,6 @@ define([
 
         receiveMessage(messageEvent) {
             const message = messageEvent.data;
-            // console.log('* received', message);
             // ignore messages not to/from the registered ids.
             // if (!message.envelope.to === this.hostId) {
             //     return;
@@ -122,7 +117,9 @@ define([
             }
             if (this.unwelcomeReceiptWarningCount > this.unwelcomeReceivedCountThreshhold) {
                 this.unwelcomeReceiptWarning = false;
-                console.warn('Unwelcome message warning disabled after ' + this.unwelcomeReceiptWarningCount + ' instances.');
+                console.warn(
+                    'Unwelcome message warning disabled after ' + this.unwelcomeReceiptWarningCount + ' instances.'
+                );
             }
 
             // A message sent as a request will have registered a response handler
@@ -193,17 +190,18 @@ define([
         }
 
         on(message, success, error) {
-            this.listen(new Listener({
-                name: message,
-                onSuccess: success,
-                onError: error
-            }));
+            this.listen(
+                new Listener({
+                    name: message,
+                    onSuccess: success,
+                    onError: error
+                })
+            );
         }
 
         sendMessage(message) {
             // message.from(this.hostId);
             // message.to(this.clientId);
-            // console.log('sending', message, this.host);
             this.window.postMessage(message.getMessage(), this.host);
         }
 
@@ -243,7 +241,6 @@ define([
                     const newListeners = listeners.filter((listener) => {
                         if (listener.timeout) {
                             const elapsed = now - listener.started.getTime();
-                            // console.log('elapsed?', listener instanceof WaitingListener, elapsed, listener.timeout);
                             if (elapsed > listener.timeout) {
                                 try {
                                     if (listener.onError) {
@@ -264,11 +261,13 @@ define([
                         delete this.waitingListeners[key];
                     }
                 });
-                if (Object.keys(this.waitingListeners).some((key) => {
-                    return this.waitingListeners[key].some((listener) => {
-                        return listener.timeout ? true : false;
-                    });
-                })) {
+                if (
+                    Object.keys(this.waitingListeners).some((key) => {
+                        return this.waitingListeners[key].some((listener) => {
+                            return listener.timeout ? true : false;
+                        });
+                    })
+                ) {
                     this.startMonitor();
                 }
             }, 100);
@@ -285,25 +284,29 @@ define([
         }
 
         once(name, success, error) {
-            this.listenOnce(new WaitingListener({
-                name: name,
-                onSuccess: success,
-                onError: error
-            }));
+            this.listenOnce(
+                new WaitingListener({
+                    name: name,
+                    onSuccess: success,
+                    onError: error
+                })
+            );
         }
 
         when(name, timeout) {
             return new Promise((resolve, reject) => {
-                return this.listenOnce(new WaitingListener({
-                    name: name,
-                    timeout: timeout,
-                    onSuccess: (payload) => {
-                        resolve(payload);
-                    },
-                    onError: (error) => {
-                        reject(error);
-                    }
-                }));
+                return this.listenOnce(
+                    new WaitingListener({
+                        name: name,
+                        timeout: timeout,
+                        onSuccess: (payload) => {
+                            resolve(payload);
+                        },
+                        onError: (error) => {
+                            reject(error);
+                        }
+                    })
+                );
             });
         }
 

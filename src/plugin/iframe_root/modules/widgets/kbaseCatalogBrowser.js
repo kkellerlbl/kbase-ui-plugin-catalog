@@ -803,23 +803,23 @@ define([
          */
         sortBy: function (sortMethod) {
             switch (sortMethod) {
-            case 'favorites':
-                // sort by number of stars, then by app name
-                this.appList.sort(function (a, b) {
-                    var aStars = a.getStarCount();
-                    var bStars = b.getStarCount();
-                    if (aStars > bStars) return -1;
-                    if (bStars > aStars) return 1;
-                    var aName = a.info.name.toLowerCase();
-                    var bName = b.info.name.toLowerCase();
-                    if (aName < bName) return -1;
-                    if (aName > bName) return 1;
-                    return 0;
-                });
-                break;
-            default:
-                // do nothing.
-                console.warn('Unsupported sort method "' + sortMethod + '"');
+                case 'favorites':
+                    // sort by number of stars, then by app name
+                    this.appList.sort(function (a, b) {
+                        var aStars = a.getStarCount();
+                        var bStars = b.getStarCount();
+                        if (aStars > bStars) return -1;
+                        if (bStars > aStars) return 1;
+                        var aName = a.info.name.toLowerCase();
+                        var bName = b.info.name.toLowerCase();
+                        if (aName < bName) return -1;
+                        if (aName > bName) return 1;
+                        return 0;
+                    });
+                    break;
+                default:
+                    // do nothing.
+                    console.warn('Unsupported sort method "' + sortMethod + '"');
             }
         },
 
@@ -1101,7 +1101,7 @@ define([
                         .css({ color: '#777' })
                         .append(
                             $('<h4>').append(
-                                $(`<a href="#spec/${url_prefix}/${type}" target="_parent">`).append(types[k])
+                                $(`<a href="#spec/${url_prefix}/${type}" target="_parent">`).append(type)
                             )
                         )
                 );
@@ -1115,7 +1115,7 @@ define([
             const $typeDiv = $('<div>').addClass('kbcb-app-card-list-container');
             $typeDivLookup.none = $typeDiv;
             $section.append(
-                $('<div>').css({'color': '#777'})
+                $('<div>').css({ 'color': '#777' })
                     .append($('<h4>').append($('<span>None</span>'))));
             $section.append($typeDiv);
             this.$appListPanel.append($section);
