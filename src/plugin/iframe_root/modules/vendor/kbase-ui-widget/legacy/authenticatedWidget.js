@@ -1,4 +1,9 @@
-define(['jquery', './widget'], function ($) {
+define([
+    'jquery',
+    './widget'
+], function (
+    $
+) {
     'use strict';
     $.KBWidget({
         name: 'kbaseAuthenticatedWidget',
@@ -19,19 +24,15 @@ define(['jquery', './widget'], function ($) {
             this._super(options);
             // An authenticated widget needs to get the initial auth state
             // from the KBaseSessionSync jquery extension.
-            // var sessionObject = Session.getKBaseSession();
-            this.setAuth(this.runtime.getService('session').getKBaseSession());
+            this.setAuth(this.runtime.service('session').getKBaseSession());
 
             // This is how to pull the value out of the auth attribute.
-            // var auth = this.auth();
             if (this.loggedInQueryCallback && this.authToken()) {
-                this.callAfterInit(
-                    function () {
-                        // use the current auth attribute value, since this is run asynchronously, and who knows,
-                        // it may have changed.
-                        this.loggedInQueryCallback(this.auth());
-                    }.bind(this)
-                );
+                this.callAfterInit(function () {
+                    // use the current auth attribute value, since this is run asynchronously, and who knows,
+                    // it may have changed.
+                    this.loggedInQueryCallback(this.auth());
+                }.bind(this));
             }
             return this;
         },

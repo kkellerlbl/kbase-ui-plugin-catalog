@@ -1,14 +1,6 @@
 // a simple reactive database for in-browser general usage
 
-define([
-    './props',
-    './lang',
-    'uuid'
-], (
-    props,
-    lang,
-    Uuid
-) => {
+define(['./props', './lang', 'uuid'], (props, lang, Uuid) => {
     'use strict';
 
     class DB {
@@ -21,7 +13,6 @@ define([
         }
 
         runOnce() {
-            // console.log('do I need to?', this.timer);
             if (this.timer) {
                 return;
             }
@@ -29,8 +20,6 @@ define([
             if (Object.keys(this.subscriptions).length === 0) {
                 return;
             }
-
-            // console.log('running because need to', this.subscriptions);
 
             this.timer = window.setTimeout(() => {
                 this.runSubscriptions();
@@ -113,7 +102,6 @@ define([
         toJSON() {
             return this.db.getRaw();
         }
-
     }
 
     return {

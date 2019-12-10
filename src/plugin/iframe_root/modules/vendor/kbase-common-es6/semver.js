@@ -40,9 +40,41 @@ define([], function () {
         const [majorBase, minorBase, patchBase, preReleaseBase] = parseSemver(baseSemver);
         const [major, minor, patch, preRelease] = parseSemver(semver);
 
-
         if (major !== majorBase) {
             return 'major-incompatible';
+        }
+
+        if (major === 0) {
+            // dev semver rules.
+            if (minor !== minorBase) {
+                return 'dev-semver-minor-incompatible';
+            }
+
+            if (patch > patchBase) {
+                return 'dev-semver-patch-too-low';
+            }
+
+            if (!preReleaseBase) {
+                if (!preRelease) {
+                    return true;
+                } else {
+                    return true;
+                }
+            } else {
+                if (!preRelease) {
+                    // If the base is a prerelease, but we are comparing to a
+                    // non-pre-release, we should be fine.
+                    return true;
+                } else {
+                    // Otherwise we need to compare the prerelease versions.
+                    // TODO: parse the prerelease tag?
+                    if (preRelease > preReleaseBase) {
+                        return 'prerelease-too-low';
+                    } else {
+                        return true;
+                    }
+                }
+            }
         }
 
         if (minor > minorBase) {
@@ -69,11 +101,10 @@ define([], function () {
                     }
                 }
             }
-
         }
 
         return true;
     }
 
-    return {parseSemver, semverIsAtLeast};
+    return { parseSemver, semverIsAtLeast };
 });
