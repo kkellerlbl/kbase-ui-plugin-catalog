@@ -1,0 +1,23 @@
+{
+    "name": "kbase-ui-plugin-catalog",
+    "version": "1.0.0",
+    "description": "A ui plugin for the KBase App Catalog",
+    "main": "index.js",
+    "scripts": {
+        "build-plugin": "bash scripts/build-plugin.bash"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kbase/kbase-ui-plugin-catalog.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kbase/kbase-ui-plugin-catalog/issues"
+    },
+    "homepage": "https://github.com/kbase/kbase-ui-plugin-catalog#readme",
+    "dependencies": {
+        "eslint": "6.4.0",
+        "standard": "14.3.1"
+    }
+}

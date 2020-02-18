@@ -6,7 +6,7 @@ These are here (for now) because they are used for the embedded iframe. We don't
 
 By hand:
 
-```
+```text
 cd build
 yarn install
 yarn clean
@@ -29,9 +29,25 @@ or
 bash scripts/build.sh
 ```
 
+or
+
+```zsh
+yarn build
+```
+
 (or your choice of shell - it is a very simple shell script without any special binding to a shell.)
 
 > Only use yarn clean if you want to clean out the stuff installed in vendor, as well as the node and bower packages installed in build.
+
+## Iterating in Development
+
+Use
+
+```text
+yarn update
+```
+
+to update the source in dist with an unminified copy of all source files. This must be done after an initial build.
 
 ## Preparing for a new release
 
