@@ -403,7 +403,7 @@ define([
             var width = '15%';
             var state = self.moduleDetails.state;
             for (var key in state) {
-                if (Object.hasOwnProperty.call(state, key)) {
+                if (Object.prototype.hasOwnProperty.call(state, key)) {
                     $stateTable.append(
                         '<tr><th width="' + width + '">' + key + '</th><td>' + JSON.stringify(state[key]) + '</td></tr>'
                     );
@@ -670,7 +670,7 @@ define([
 
             var ids = [];
             for (var a in self.appLookup) {
-                if (!Object.hasOwnProperty.call(self.appLookup, a)) continue;
+                if (!Object.prototype.hasOwnProperty.call(self.appLookup, a)) continue;
                 ids.push(self.appLookup[a].info.id);
             }
 
