@@ -203,53 +203,53 @@ define([
             $content.append($ctrList);
 
             // ORGANIZE BY
-            var $obMyFavs = $('<a>');
+            var $obMyFavs = $('<a href="#">');
             if (this.isLoggedIn) {
                 $obMyFavs.append('My Favorites').on('click', () => {
                     this.renderAppList('my_favorites');
                 });
             }
-            var $obFavs = $('<a>')
+            var $obFavs = $('<a href="#">')
                 .append('Favorites Count')
                 .on('click', () => {
                     this.renderAppList('favorites');
                 });
-            var $obRuns = $('<a>')
+            var $obRuns = $('<a href="#">')
                 .append('Run Count')
                 .on('click', () => {
                     this.renderAppList('runs');
                 });
-            var $obNameAz = $('<a>')
+            var $obNameAz = $('<a href="#">')
                 .append('Name (a-z)')
                 .on('click', () => {
                     this.renderAppList('name_az');
                 });
-            var $obNameZa = $('<a>')
+            var $obNameZa = $('<a href="#">')
                 .append('Name (z-a)')
                 .on('click', () => {
                     this.renderAppList('name_za');
                 });
-            var $obCat = $('<a>')
+            var $obCat = $('<a href="#">')
                 .append('Category')
                 .on('click', () => {
                     this.renderAppList('category');
                 });
-            var $obModule = $('<a>')
+            var $obModule = $('<a href="#">')
                 .append('Module')
                 .on('click', () => {
                     this.renderAppList('module');
                 });
-            var $obOwner = $('<a>')
+            var $obOwner = $('<a href="#">')
                 .append('Developer')
                 .on('click', () => {
                     this.renderAppList('developer');
                 });
-            var $obInput = $('<a>')
+            var $obInput = $('<a href="#">')
                 .append('Input Types')
                 .on('click', () => {
                     this.renderAppList('input_types');
                 });
-            var $obOutput = $('<a>')
+            var $obOutput = $('<a href="#">')
                 .append('Output Types')
                 .on('click', () => {
                     this.renderAppList('output_types');
@@ -694,8 +694,8 @@ define([
                     app: this.apps[k],
                     module: this.moduleLookup[this.apps[k]['module_name']],
                     nms_base_url: this.nms_base_url,
-                    favoritesCallback: () => {
-                        this.toggleFavorite(arguments);
+                    favoritesCallback: (appCard) => {
+                        this.toggleFavorite(appCard);
                     },
                     isLoggedIn: this.isLoggedIn,
                     showReleaseTagLabels: this.showReleaseTagLabels,
@@ -809,7 +809,7 @@ define([
                     var appCats = this.appList[k].info.categories;
                     var gotCat = false;
                     for (var i = 0; i < appCats.length; i++) {
-                        if (Object.hasOwnProperty.prototype.call($catDivLookup, appCats[i])) {
+                        if (Object.prototype.hasOwnProperty.call($catDivLookup, appCats[i])) {
                             gotCat = true;
                             $catDivLookup[appCats[i]].append(this.appList[k].getNewCardDiv());
                         }
