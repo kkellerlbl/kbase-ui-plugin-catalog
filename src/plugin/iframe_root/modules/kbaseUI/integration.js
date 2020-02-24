@@ -34,38 +34,6 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             return JSON.parse(decodeURIComponent(this.rootWindow.frameElement.getAttribute('data-params')));
         }
 
-        // render(ko) {
-        //     this.rootViewModel = new RootViewModel({
-        //         runtime: this.runtime,
-        //         hostChannel: this.hostChannel,
-        //         authorized: this.authorized,
-        //         authorization: this.authorization,
-        //         pluginParams: this.pluginParams
-        //     });
-        //     this.container.innerHTML = div(
-        //         {
-        //             style: {
-        //                 flex: '1 1 0px',
-        //                 display: 'flex',
-        //                 flexDirection: 'column'
-        //             }
-        //         },
-        //         gen.if(
-        //             'ready',
-        //             gen.component({
-        //                 name: MainComponent.name(),
-        //                 params: {
-        //                     runtime: 'runtime',
-        //                     bus: 'bus',
-        //                     authorization: 'authorization',
-        //                     pluginParams: 'pluginParams'
-        //                 }
-        //             })
-        //         )
-        //     );
-        //     ko.applyBindings(this.rootViewModel, this.container);
-        // }
-
         showHelp() {
             this.rootViewModel.bus.send('help');
         }
@@ -100,8 +68,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
 
                 // TODO: proper routing to error page
                 if ((!path || path.length === 0) && !params.view) {
-                    console.log('navigate?', message);
-                    alert('no view provided?...');
+                    alert('no view provided...');
                     return;
                 }
 
@@ -119,6 +86,16 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             });
             this.runtime.messenger.receive({
                 channel: 'app',
+                message: 'auth-navigate',
+                handler: ({ nextRequest, tokenInfo }) => {
+                    this.channel.send('ui-auth-navigate', {
+                        nextRequest,
+                        tokenInfo
+                    });
+                }
+            });
+            this.runtime.messenger.receive({
+                channel: 'app',
                 message: 'post-form',
                 handler: ({ action, params }) => {
                     this.channel.send('post-form', { action, params });
@@ -129,6 +106,14 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                 message: 'setTitle',
                 handler: (title) => {
                     this.channel.send('set-title', { title });
+                }
+            });
+            // TODO: should be a way to simply forward messages to the ui...
+            this.runtime.messenger.receive({
+                channel: 'profile',
+                message: 'reload',
+                handler: () => {
+                    this.channel.send('reload-profile', {});
                 }
             });
         }
@@ -146,12 +131,9 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                 // ready message, is itself ready, and is ready for
                 // the iframe app to start running.
                 this.channel.on('start', (payload) => {
-                    const { token, username, config, realname, email } = payload;
-                    if (token) {
-                        this.authorization = { token, username, realname, email };
-                    } else {
-                        this.authorization = null;
-                    }
+                    const { authorization, config} = payload;
+                    this.authorization = authorization || null;
+                    const {token, username} = authorization;
                     this.token = token;
                     this.username = username;
                     this.config = config;
@@ -174,61 +156,6 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                         .catch((err) => {
                             reject(err);
                         });
-
-                    // this.runtime = new runtime.Runtime({ config, token, username, realname, email });
-                    // this.render(ko);
-
-                    // this.rootViewModel.bus.on('set-plugin-params', ({ pluginParams }) => {
-                    //     this.hostChannel.send('set-plugin-params', { pluginParams });
-                    // });
-
-                    // this.channel.on('show-help', () => {
-                    //     this.showHelp();
-                    // });
-
-                    // this.channel.on('loggedin', ({ token, username, realname, email }) => {
-                    //     this.runtime.auth({ token, username, realname, email });
-                    //     this.rootViewModel.authorized(true);
-                    //     this.rootViewModel.authorization({ token, username, realname, email });
-                    //     // really faked for now.
-                    //     // this.runtime.service('session').
-                    // });
-
-                    // this.channel.on('loggedout', () => {
-                    //     this.runtime.unauth();
-                    //     this.rootViewModel.authorized(false);
-                    //     this.rootViewModel.authorization(null);
-                    // });
-
-                    // this.rootViewModel.bus.on('instrumentation', (payload) => {
-                    //     this.hostChannel.send('send-instrumentation', payload);
-                    // });
-
-                    // this.hostChannel.send('add-button', {
-                    //     button: {
-                    //         name: 'feedback',
-                    //         label: 'Feedback',
-                    //         style: 'default',
-                    //         icon: 'bullhorn',
-                    //         toggle: false,
-                    //         params: {
-                    //         },
-                    //         callbackMessage: ['show-feedback', null]
-                    //     }
-                    // });
-
-                    // this.hostChannel.send('add-button', {
-                    //     button: {
-                    //         name: 'help',
-                    //         label: 'Help',
-                    //         style: 'default',
-                    //         icon: 'question-circle',
-                    //         toggle: false,
-                    //         params: {
-                    //         },
-                    //         callbackMessage: ['show-help', null]
-                    //     }
-                    // });
                 });
 
                 window.document.addEventListener('click', () => {
@@ -245,7 +172,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             });
         }
 
-        stop() {}
+        stop() { }
     }
 
     return Integration;
