@@ -205,53 +205,63 @@ define([
             // ORGANIZE BY
             var $obMyFavs = $('<a href="#">');
             if (this.isLoggedIn) {
-                $obMyFavs.append('My Favorites').on('click', () => {
+                $obMyFavs.append('My Favorites').on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('my_favorites');
                 });
             }
             var $obFavs = $('<a href="#">')
                 .append('Favorites Count')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('favorites');
                 });
             var $obRuns = $('<a href="#">')
                 .append('Run Count')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('runs');
                 });
             var $obNameAz = $('<a href="#">')
                 .append('Name (a-z)')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('name_az');
                 });
             var $obNameZa = $('<a href="#">')
                 .append('Name (z-a)')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('name_za');
                 });
             var $obCat = $('<a href="#">')
                 .append('Category')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('category');
                 });
             var $obModule = $('<a href="#">')
                 .append('Module')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('module');
                 });
             var $obOwner = $('<a href="#">')
                 .append('Developer')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('developer');
                 });
             var $obInput = $('<a href="#">')
                 .append('Input Types')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('input_types');
                 });
             var $obOutput = $('<a href="#">')
                 .append('Output Types')
-                .on('click', () => {
+                .on('click', (e) => {
+                    e.preventDefault();
                     this.renderAppList('output_types');
                 });
 
