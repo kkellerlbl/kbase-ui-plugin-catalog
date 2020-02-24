@@ -11,23 +11,19 @@ source:
   styles:
     # - file: styles.css
 install:
-  widgets:
-    - module: ./panel
-      id: kb_plugin_catalog
-      type: es6
   routes:
     # Catalog Index
     # The catalog index is the view which lists additional catalog tools.
     - path: [catalog, { type: literal, name: index, optional: true }]
       params:
         view: catalogIndex
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # plain catalog/apps with optional tag goes to the app browser
     - path: [catalog, apps, { type: param, name: tag, optional: true }]
       params:
         view: appsBrowser
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # App View
     # catalog/apps/NAMESPACE/ID and
@@ -43,35 +39,35 @@ install:
         ]
       params:
         view: appView
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # Module Browser and View
     - path: [catalog, modules]
       params:
         view: moduleBrowser
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path: [catalog, modules, { type: param, name: module_name }]
       params:
         view: moduleView
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path: [catalog, module, { type: param, name: module_name }]
       params:
         view: moduleView
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # Dynamic Services Catalog
     - path: [catalog, services]
       params:
         view: serviceCatalog
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # Functions browser and view
     - path: [catalog, functions, { type: param, name: tag, optional: true }]
       params:
         view: functionBrowser
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
     - path:
         [
           catalog,
@@ -82,13 +78,13 @@ install:
         ]
       params:
         view: functionView
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # Data Types Browser
     - path: [catalog, datatypes]
       params:
         view: datatypeBrowser
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # Developer Tools
 
@@ -103,24 +99,24 @@ install:
         ]
       params:
         view: catalogRegistration
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
     - path: [catalog, stats]
       params:
         view: catalogStats
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
     - path:
         [catalog, status, { type: param, name: module_names, optional: true }]
       params:
         view: catalogStatus
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
     - path: [catalog, admin]
       params:
         view: catalogAdmin
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
     - path: [catalog, queue]
       params:
         view: catalogQueue
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # OLD ROUTES
     # Todo: do we still need these?
@@ -142,13 +138,13 @@ install:
         ]
       params:
         view: appsBrowser
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path:
         [appcatalog, module, { type: param, name: module_name, optional: true }]
       params:
         view: moduleView
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path:
         [
@@ -160,7 +156,7 @@ install:
         ]
       params:
         view: appView
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     # Different from the 'catalog' version because the registration id is otional
     - path:
@@ -171,7 +167,7 @@ install:
         ]
       params:
         view: catalogRegistration
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path:
         [
@@ -181,22 +177,22 @@ install:
         ]
       params:
         view: catalogStatus
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path: [appcatalog, service]
       params:
         view: serviceCatalog
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path: [appcatalog, admin]
       params:
         view: catalogAdmin
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
     - path: [appcatalog, stats]
       params:
         view: catalogStats
-      widget: kb_plugin_catalog
+      widget: kb_iframe_loader
 
   menu:
     - name: catalog

@@ -741,7 +741,7 @@ define([
                         var appCats = self.functionList[k].info.tags.categories;
                         var gotCat = false;
                         for (let i = 0; i < appCats.length; i++) {
-                            if ($catDivLookup.hasOwnProperty(appCats[i])) {
+                            if (Object.prototype.hasOwnProperty.call($catDivLookup, appCats[i])) {
                                 gotCat = true;
                                 $catDivLookup[appCats[i]].append(self.functionList[k].getNewCardDiv());
                             }
