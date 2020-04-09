@@ -1062,7 +1062,7 @@ define([
                         .css({ color: '#777' })
                         .append(
                             $('<h4>').append(
-                                $(`<a href="#spec/${url_prefix}/${type}" target="_parent">`).append(type)
+                                $(`<a href="/#spec/${url_prefix}/${type}" target="_parent">`).append(type)
                             )
                         )
                 );
