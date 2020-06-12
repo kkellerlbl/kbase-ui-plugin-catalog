@@ -120,13 +120,11 @@ install:
         ]
       params:
         view: appsBrowser
-      component: /pluginSupport/Plugin
 
     - path:
         [appcatalog, module, {type: param, name: module_name, optional: true}]
       params:
         view: moduleView
-      component: /pluginSupport/Plugin
 
     - path:
         [
@@ -138,7 +136,6 @@ install:
         ]
       params:
         view: appView
-      component: /pluginSupport/Plugin
 
     # Different from the 'catalog' version because the registration id is optional
     - path:
@@ -149,7 +146,6 @@ install:
         ]
       params:
         view: catalogRegistration
-      component: /pluginSupport/Plugin
 
     - path:
         [appcatalog, status, {type: param, name: module_names, optional: true}]
@@ -168,7 +164,7 @@ install:
       params:
         view: catalogStats
 
-        menu:
+  menu:
     - name: catalog
       definition:
         path: [catalog, apps]
