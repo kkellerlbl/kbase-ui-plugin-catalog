@@ -4,7 +4,8 @@
     "description": "A ui plugin for the KBase App Catalog",
     "main": "index.js",
     "scripts": {
-        "build-plugin": "bash scripts/build-plugin.bash"
+        "build": "bash scripts/build-plugin.bash",
+        "build-dev": "bash scripts/build-plugin-dev.bash"
     },
     "repository": {
         "type": "git",
