@@ -7,7 +7,7 @@ package:
 services:
   route:
     defaults:
-      forceMount: true
+      forceMount: false
     routes:
       # Catalog Index
       # The catalog index is the view which lists additional catalog tools.
