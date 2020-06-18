@@ -54,11 +54,18 @@ define(['require'], (require) => {
                 return Promise.resolve();
             }
             return promiseTry(() => {
-                return this.currentPanel.widget.stop();
-            }).then(() => {
-                return this.currentPanel.widget.detach();
-            });
-        }
+                return this.currentPanel.widget.stop && this.currentPanel.widget.stop();
+            })
+                .then(() => {
+                    return this.currentPanel.widget.detach && this.currentPanel.widget.detach();
+                })
+                .then(() => {
+                    return this.currentPanel.widget.destroy && this.currentPanel.widget.destroy();
+                })
+                .finally(() => {
+                    this.hostNode.innerHTML = '';
+                })
+            }
 
         dispatch({ view: viewId, path, params }) {
             const view = this.selectView(viewId);

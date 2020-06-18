@@ -35,21 +35,6 @@ define(['../widget/manager'], function (WidgetManager) {
         stop() {
             return true;
         }
-        // pluginHandler(widgetsConfig, pluginConfig) {
-        //     return Promise.try(() => {
-        //         widgetsConfig.forEach((widgetDef) => {
-        //             // If source modules are not specified, we are using module
-        //             // paths. A full path will start with "plugins/" and a relative
-        //             // path won't. Prefix a relative path with the plugin's module path.
-        //             if (!pluginConfig.usingSourceModules) {
-        //                 if (!widgetDef.module.match(/^plugins\//)) {
-        //                     widgetDef.module = [pluginConfig.moduleRoot, widgetDef.module].join('/');
-        //                 }
-        //             }
-        //             this.widgetManager.addWidget(widgetDef);
-        //         });
-        //     });
-        // }
         getWidget() {
             return proxyMethod(this.widgetManager, 'getWidget', arguments);
         }

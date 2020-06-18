@@ -9,7 +9,7 @@ define([
     'use strict';
 
     class Runtime {
-        constructor({ token, username, config }) {
+        constructor({ token, username, config, pluginConfig }) {
             this.token = token;
             this.username = username;
             this.widgetManager = new WidgetManager({
@@ -20,8 +20,7 @@ define([
 
             this.configDb = new props.Props({ data: config });
 
-            // TODO: should not be hard coded here...
-            this.pluginPath = '/modules/plugins/catalog/iframe_root';
+            this.pluginPath = `/modules/plugins/${pluginConfig.package.name}/iframe_root`;
             this.pluginResourcePath = this.pluginPath + '/resources';
 
             this.messenger = new Messenger();

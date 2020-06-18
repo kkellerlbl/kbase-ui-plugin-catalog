@@ -3,6 +3,12 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
 
     class Integration {
         constructor({ rootWindow, pluginConfig }) {
+            if (!rootWindow) {
+                throw new Error('Constructor argument property "rootWindow" is required');
+            }
+            if (!pluginConfig) {
+                throw new Error('Constructor argument property "pluginConfig" is required');
+            }
             this.rootWindow = rootWindow;
             this.container = rootWindow.document.body;
             // channelId, frameId, hostId, parentHost
@@ -18,7 +24,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             this.navigationListeners = [];
             this.navigationQueue = [];
 
-            this.channel = new WindowChannel.BidirectionalWindowChannel({
+            this.channel = new WindowChannel({
                 on: this.rootWindow,
                 host: document.location.origin,
                 to: this.hostChannelId
@@ -62,6 +68,16 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             }
         }
 
+        // handleView({view, params}) {
+
+        // }
+
+        setupDOMListeners() {
+            window.document.addEventListener('click', () => {
+                this.channel.send('clicked', {});
+            });
+        }
+
         setupListeners() {
             this.channel.on('navigate', (message) => {
                 const { path, params } = message;
@@ -74,6 +90,11 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
 
                 this.handleNavigation({ path, params });
             });
+
+            // this.channel.on('view', (message) => {
+            //     const {view, params} = message;
+            //     this.handleView( {view, params });
+            // })
         }
 
         setupRuntimeListeners() {
@@ -151,6 +172,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                         .then(() => {
                             this.setupListeners();
                             this.setupRuntimeListeners();
+                            this.setupDOMListeners();
                             resolve();
                         })
                         .catch((err) => {
@@ -158,9 +180,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                         });
                 });
 
-                window.document.addEventListener('click', () => {
-                    this.channel.send('clicked', {});
-                });
+               
 
                 // Sending 'ready' with our channel id and host name allows the
                 // enclosing app (window) to send us messages on our very own channel.
@@ -168,7 +188,9 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                 // on the same channel, with control via the channel id. However, there is a risk
                 // the the channels will listen on for the same message ... unlikely though.
                 // Still, it would be odd for one window to listen for messages on another...
-                this.channel.send('ready', {});
+                this.channel.send('ready', {
+                    channelId: this.channel.channelId
+                });
             });
         }
 

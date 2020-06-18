@@ -4,7 +4,9 @@
     "description": "A ui plugin for the KBase App Catalog",
     "main": "index.js",
     "scripts": {
-        "build-plugin": "bash scripts/build-plugin.bash"
+        "build": "bash scripts/build-plugin.bash",
+        "build-dev": "bash scripts/build-plugin-dev.bash",
+        "install-dev": "bash scripts/install-plugin-dev.bash"
     },
     "repository": {
         "type": "git",
@@ -17,7 +19,7 @@
     },
     "homepage": "https://github.com/kbase/kbase-ui-plugin-catalog#readme",
     "dependencies": {
-        "eslint": "6.8.0",
-        "standard": "14.3.1"
+        "eslint": "7.2.0",
+        "standard": "14.3.4"
     }
 }

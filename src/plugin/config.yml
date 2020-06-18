@@ -1,198 +1,177 @@
 ## Plugin Configuration
 ---
 package:
-  author: KBase Developer
   name: catalog
   description: The catalog panel and associated widgets
-source:
-  ## sources are relative to build/plugins/PACKAGE/source/javascript
-  ## NB: need to quote file names, otherwise
-  modules:
-  styles:
-    # - file: styles.css
-install:
-  routes:
-    # Catalog Index
-    # The catalog index is the view which lists additional catalog tools.
-    - path: [catalog, { type: literal, name: index, optional: true }]
-      params:
-        view: catalogIndex
-      widget: kb_iframe_loader
 
-    # plain catalog/apps with optional tag goes to the app browser
-    - path: [catalog, apps, { type: param, name: tag, optional: true }]
-      params:
-        view: appsBrowser
-      widget: kb_iframe_loader
+services:
+  route:
+    defaults:
+      forceMount: false
+    routes:
+      # Catalog Index
+      # The catalog index is the view which lists additional catalog tools.
+      - path: [catalog, {type: literal, name: index, optional: true}]
+        params:
+          view: catalogIndex
 
-    # App View
-    # catalog/apps/NAMESPACE/ID and
-    # catalog/apps/NAMESPACE/ID/TAG
-    # lead to the app viewer
-    - path:
-        [
-          catalog,
-          apps,
-          { type: param, name: namespace },
-          { type: param, name: id },
-          { type: param, name: tag, optional: true },
-        ]
-      params:
-        view: appView
-      widget: kb_iframe_loader
+      # plain catalog/apps with optional tag goes to the app browser
+      - path: [catalog, apps, {type: param, name: tag, optional: true}]
+        params:
+          view: appsBrowser
 
-    # Module Browser and View
-    - path: [catalog, modules]
-      params:
-        view: moduleBrowser
-      widget: kb_iframe_loader
+      # App View
+      # catalog/apps/NAMESPACE/ID and
+      # catalog/apps/NAMESPACE/ID/TAG
+      # lead to the app viewer
+      - path:
+          [
+            catalog,
+            apps,
+            {type: param, name: namespace},
+            {type: param, name: id},
+            {type: param, name: tag, optional: true},
+          ]
+        params:
+          view: appView
 
-    - path: [catalog, modules, { type: param, name: module_name }]
-      params:
-        view: moduleView
-      widget: kb_iframe_loader
+      # Module Browser and View
+      - path: [catalog, modules]
+        params:
+          view: moduleBrowser
 
-    - path: [catalog, module, { type: param, name: module_name }]
-      params:
-        view: moduleView
-      widget: kb_iframe_loader
+      - path: [catalog, modules, {type: param, name: module_name}]
+        params:
+          view: moduleView
 
-    # Dynamic Services Catalog
-    - path: [catalog, services]
-      params:
-        view: serviceCatalog
-      widget: kb_iframe_loader
+      - path: [catalog, module, {type: param, name: module_name}]
+        params:
+          view: moduleView
 
-    # Functions browser and view
-    - path: [catalog, functions, { type: param, name: tag, optional: true }]
-      params:
-        view: functionBrowser
-      widget: kb_iframe_loader
-    - path:
-        [
-          catalog,
-          functions,
-          { type: param, name: module },
-          { type: param, name: function_id },
-          { type: param, name: ver, optional: true },
-        ]
-      params:
-        view: functionView
-      widget: kb_iframe_loader
+      # Dynamic Services Catalog
+      - path: [catalog, services]
+        params:
+          view: serviceCatalog
 
-    # Data Types Browser
-    - path: [catalog, datatypes]
-      params:
-        view: datatypeBrowser
-      widget: kb_iframe_loader
+      # Functions browser and view
+      - path: [catalog, functions, {type: param, name: tag, optional: true}]
+        params:
+          view: functionBrowser
 
-    # Developer Tools
+      - path:
+          [
+            catalog,
+            functions,
+            {type: param, name: module},
+            {type: param, name: function_id},
+            {type: param, name: ver, optional: true},
+          ]
+        params:
+          view: functionView
 
-    # Registration view
+      # Data Types Browser
+      - path: [catalog, datatypes]
+        params:
+          view: datatypeBrowser
 
-    # TODO: make sure it works.
-    - path:
-        [
-          catalog,
-          register,
-          { type: param, name: registration_id, optional: true },
-        ]
-      params:
-        view: catalogRegistration
-      widget: kb_iframe_loader
-    - path: [catalog, stats]
-      params:
-        view: catalogStats
-      widget: kb_iframe_loader
-    - path:
-        [catalog, status, { type: param, name: module_names, optional: true }]
-      params:
-        view: catalogStatus
-      widget: kb_iframe_loader
-    - path: [catalog, admin]
-      params:
-        view: catalogAdmin
-      widget: kb_iframe_loader
-    - path: [catalog, queue]
-      params:
-        view: catalogQueue
-      widget: kb_iframe_loader
+      # Developer Tools
 
-    # OLD ROUTES
-    # Todo: do we still need these?
-    # For now, let's just keep the root appcatalog. The rest of the routes
-    # (see the old config.yml) are duplicates of most of the above, and i would bet
-    # that the vast majority of links to them are generated right here in this
-    # plugin.
-    # Well, the narrative, at least uses appcatalog links.
-    #
-    # App Browser
-    # The normal user home page for the catalog is the app browser
-    # A variant of above (is the above even used?)
+      # Registration view
 
-    - path:
-        [
-          appcatalog,
-          { type: literal, name: browse, optional: true },
-          { type: param, name: tag, optional: true },
-        ]
-      params:
-        view: appsBrowser
-      widget: kb_iframe_loader
+      # TODO: make sure it works.
+      - path:
+          [
+            catalog,
+            register,
+            {type: param, name: registration_id, optional: true},
+          ]
+        params:
+          view: catalogRegistration
 
-    - path:
-        [appcatalog, module, { type: param, name: module_name, optional: true }]
-      params:
-        view: moduleView
-      widget: kb_iframe_loader
+      - path: [catalog, stats]
+        params:
+          view: catalogStats
 
-    - path:
-        [
-          appcatalog,
-          app,
-          { type: param, name: namespace },
-          { type: param, name: id },
-          { type: param, name: tag, optional: true },
-        ]
-      params:
-        view: appView
-      widget: kb_iframe_loader
+      - path:
+          [catalog, status, {type: param, name: module_names, optional: true}]
+        params:
+          view: catalogStatus
 
-    # Different from the 'catalog' version because the registration id is otional
-    - path:
-        [
-          appcatalog,
-          register,
-          { type: param, name: registration_id, optional: true },
-        ]
-      params:
-        view: catalogRegistration
-      widget: kb_iframe_loader
+      - path: [catalog, admin]
+        params:
+          view: catalogAdmin
 
-    - path:
-        [
-          appcatalog,
-          status,
-          { type: param, name: module_names, optional: true },
-        ]
-      params:
-        view: catalogStatus
-      widget: kb_iframe_loader
+      - path: [catalog, queue]
+        params:
+          view: catalogQueue
 
-    - path: [appcatalog, service]
-      params:
-        view: serviceCatalog
-      widget: kb_iframe_loader
+      # OLD ROUTES
+      # Todo: do we still need these?
+      # For now, let's just keep the root appcatalog. The rest of the routes
+      # (see the old config.yml) are duplicates of most of the above, and i would bet
+      # that the vast majority of links to them are generated right here in this
+      # plugin.
+      # Well, the narrative, at least uses appcatalog links.
+      #
+      # App Browser
+      # The normal user home page for the catalog is the app browser
+      # A variant of above (is the above even used?)
 
-    - path: [appcatalog, admin]
-      params:
-        view: catalogAdmin
-      widget: kb_iframe_loader
+      - path:
+          [
+            appcatalog,
+            {type: literal, name: browse, optional: true},
+            {type: param, name: tag, optional: true},
+          ]
+        params:
+          view: appsBrowser
 
-    - path: [appcatalog, stats]
-      params:
-        view: catalogStats
-      widget: kb_iframe_loader
+      - path:
+          [appcatalog, module, {type: param, name: module_name, optional: true}]
+        params:
+          view: moduleView
+
+      - path:
+          [
+            appcatalog,
+            app,
+            {type: param, name: namespace},
+            {type: param, name: id},
+            {type: param, name: tag, optional: true},
+          ]
+        params:
+          view: appView
+
+      # Different from the 'catalog' version because the registration id is optional
+      - path:
+          [
+            appcatalog,
+            register,
+            {type: param, name: registration_id, optional: true},
+          ]
+        params:
+          view: catalogRegistration
+
+      - path:
+          [
+            appcatalog,
+            status,
+            {type: param, name: module_names, optional: true},
+          ]
+        params:
+          view: catalogStatus
+
+      - path: [appcatalog, service]
+        params:
+          view: serviceCatalog
+
+      - path: [appcatalog, admin]
+        params:
+          view: catalogAdmin
+
+      - path: [appcatalog, stats]
+        params:
+          view: catalogStats
 
   menu:
     - name: catalog

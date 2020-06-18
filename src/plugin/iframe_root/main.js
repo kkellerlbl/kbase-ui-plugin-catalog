@@ -51,19 +51,18 @@ require.config({
 
 require([
     'bluebird',
-    // 'kbaseUI/runtime',
-    // 'lib/auth2ClientRuntime',
     'kbaseUI/integration',
     'kbaseUI/dispatcher',
     'kb_knockout/load',
     'yaml!./config.yml',
-    'bootstrap',
+    'bootstrap', 
     'css!font_awesome'
 ], (Promise, Integration, Dispatcher, knockoutLoader, pluginConfig) => {
     'use strict';
     Promise.try(() => {
         const integration = new Integration({
-            rootWindow: window
+            rootWindow: window,
+            pluginConfig
         });
 
         // Add custom event hooks into the integration.
@@ -108,89 +107,21 @@ require([
             })
             .then(() => {
                 // Add routes to panels here
-                const panels = [
-                    {
-                        module: '../catalog_index',
-                        view: 'catalogIndex',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_app_browser',
-                        view: 'appsBrowser',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_app_viewer',
-                        view: 'appView',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_module_browser',
-                        view: 'moduleBrowser',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_module_viewer',
-                        view: 'moduleView',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_service',
-                        view: 'serviceCatalog',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_function_browser',
-                        view: 'functionBrowser',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_function_viewer',
-                        view: 'functionView',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_type_browser',
-                        view: 'datatypeBrowser',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_registration',
-                        view: 'catalogRegistration',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_stats',
-                        view: 'catalogStats',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_status',
-                        view: 'catalogStatus',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_admin',
-                        view: 'catalogAdmin',
-                        type: 'factory'
-                    },
-                    {
-                        module: '../catalog_queue',
-                        view: 'catalogQueue',
-                        type: 'factory'
-                    }
-                ];
-                dispatcher = new Dispatcher({ runtime: integration.runtime, node: rootNode, views: panels });
+                
+                dispatcher = new Dispatcher({ runtime: integration.runtime, node: rootNode, views: pluginConfig.views });
                 return dispatcher.start();
             })
             .then((dispatcher) => {
-                integration.onNavigate(({ path, params }) => {
+                integration.onNavigate(({ view, path, params }) => {
                     // TODO: ever
-                    let view;
-                    if (params.view) {
+                    if (!view && params.view) {
                         view = params.view;
                     } else {
                         view = path[0];
+                    }
+                    if (!view) {
+                        console.error('"view" missing', view, path, params);
+                        throw new Error('A "view" is required for navigation');
                     }
                     dispatcher.dispatch({ view, path, params });
                 });
