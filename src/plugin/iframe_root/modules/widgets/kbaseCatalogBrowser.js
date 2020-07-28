@@ -993,7 +993,7 @@ define([
             $mySection.append(
                 $('<div>')
                     .css({ color: '#777' })
-                    .append($('<h4>').append('My Favoritesx'))
+                    .append($('<h4>').append('My Favorites'))
             );
             $mySection.append($myDiv);
             this.$appListPanel.append($mySection);

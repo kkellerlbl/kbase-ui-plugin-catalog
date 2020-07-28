@@ -517,7 +517,7 @@ define([
         renderQueueStats: function () {
             var self = this;
             if (self.queueStats == null) {
-                console.log('Queue stats not found');
+                console.warn('Queue stats not found');
                 return;
             }
 

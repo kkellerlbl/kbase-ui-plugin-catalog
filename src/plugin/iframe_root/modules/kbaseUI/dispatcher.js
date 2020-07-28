@@ -54,30 +54,30 @@ define(['require'], (require) => {
                 return Promise.resolve();
             }
             return promiseTry(() => {
-                return this.currentPanel.widget.stop && this.currentPanel.widget.stop();
+                return this.currentPanel.widget.stop();
+            }).then(() => {
+                return this.currentPanel.widget.detach();
             })
-                .then(() => {
-                    return this.currentPanel.widget.detach && this.currentPanel.widget.detach();
-                })
-                .then(() => {
-                    return this.currentPanel.widget.destroy && this.currentPanel.widget.destroy();
-                })
-                .finally(() => {
-                    this.hostNode.innerHTML = '';
-                })
-            }
+            .then(() => {
+                this.hostNode.innerHTML = '';
+            });
+        }
 
-        dispatch({ view: viewId, path, params }) {
+        dispatch({ view: viewId, params }) {
             const view = this.selectView(viewId);
             if (!view || !view.module) {
-                console.warn('bad view request', viewId, path, params);
+                console.warn('bad view request', viewId, params);
                 alert('oops, bad view request: ' + view);
                 return;
             }
 
-            if (this.currentPanel && this.currentPanel.view === view) {
-                return this.currentPanel.widget.run(params);
-            }
+            // Disable re-entrant behavior. The catalog widgets were not designed for this use case.
+            // TODO: change it so that it is!
+
+            // if (this.currentPanel && this.currentPanel.view === view && view.reentrant !== false && this.currentPanel.widget.run) {
+            //     return this.currentPanel.widget.run(params);
+            // }
+
 
             return this.unmount()
                 .then(() => {
