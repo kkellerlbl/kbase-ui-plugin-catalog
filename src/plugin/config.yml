@@ -3,7 +3,6 @@
 package:
   name: catalog
   description: The catalog panel and associated widgets
-
 services:
   route:
     defaults:
@@ -11,99 +10,67 @@ services:
     routes:
       # Catalog Index
       # The catalog index is the view which lists additional catalog tools.
-      - path: [catalog, {type: literal, name: index, optional: true}]
-        params:
-          view: catalogIndex
+      - path: catalog
+        view: catalogIndex
+
+      - path: catalog/index
+        view: catalogIndex
 
       # plain catalog/apps with optional tag goes to the app browser
-      - path: [catalog, apps, {type: param, name: tag, optional: true}]
-        params:
-          view: appsBrowser
+      - path: catalog/apps/:-tag
+        view: appsBrowser
 
       # App View
       # catalog/apps/NAMESPACE/ID and
       # catalog/apps/NAMESPACE/ID/TAG
       # lead to the app viewer
-      - path:
-          [
-            catalog,
-            apps,
-            {type: param, name: namespace},
-            {type: param, name: id},
-            {type: param, name: tag, optional: true},
-          ]
-        params:
-          view: appView
+      - path: catalog/apps/:namespace/:id/:-tag
+        view: appView
 
       # Module Browser and View
-      - path: [catalog, modules]
-        params:
-          view: moduleBrowser
+      - path: catalog/modules
+        view: moduleBrowser
 
-      - path: [catalog, modules, {type: param, name: module_name}]
-        params:
-          view: moduleView
+      - path: catalog/modules/:module_name
+        view: moduleView
 
-      - path: [catalog, module, {type: param, name: module_name}]
-        params:
-          view: moduleView
+      - path: catalog/module/:module_name
+        view: moduleView
 
       # Dynamic Services Catalog
-      - path: [catalog, services]
-        params:
-          view: serviceCatalog
+      - path: catalog/services
+        view: serviceCatalog
 
       # Functions browser and view
-      - path: [catalog, functions, {type: param, name: tag, optional: true}]
-        params:
-          view: functionBrowser
+      - path: catalog/functions/:-tag
+        view: functionBrowser
 
-      - path:
-          [
-            catalog,
-            functions,
-            {type: param, name: module},
-            {type: param, name: function_id},
-            {type: param, name: ver, optional: true},
-          ]
-        params:
-          view: functionView
+      - path: catalog/functions/:module/:function_id/:-ver
+        view: functionView
 
       # Data Types Browser
-      - path: [catalog, datatypes]
-        params:
-          view: datatypeBrowser
+      - path: catalog/datatypes
+        view: datatypeBrowser
 
       # Developer Tools
 
       # Registration view
 
       # TODO: make sure it works.
-      - path:
-          [
-            catalog,
-            register,
-            {type: param, name: registration_id, optional: true},
-          ]
-        params:
-          view: catalogRegistration
+      - path: catalog/register/:-registration_id
+        view: catalogRegistration
 
-      - path: [catalog, stats]
-        params:
-          view: catalogStats
+      - path: catalog/stats
+        view: catalogStats
 
-      - path:
-          [catalog, status, {type: param, name: module_names, optional: true}]
-        params:
-          view: catalogStatus
+      - path: catalog/status/:-module_names
+        view: catalogStatus
 
-      - path: [catalog, admin]
-        params:
-          view: catalogAdmin
+      - path: catalog/admin
+        view: catalogAdmin
 
-      - path: [catalog, queue]
-        params:
-          view: catalogQueue
+      - path: catalog/queue
+        view: catalogQueue
 
       # OLD ROUTES
       # Todo: do we still need these?
@@ -117,62 +84,30 @@ services:
       # The normal user home page for the catalog is the app browser
       # A variant of above (is the above even used?)
 
-      - path:
-          [
-            appcatalog,
-            {type: literal, name: browse, optional: true},
-            {type: param, name: tag, optional: true},
-          ]
-        params:
-          view: appsBrowser
+      - path: appcatalog/:-browse/:-tag
+        view: appsBrowser
 
-      - path:
-          [appcatalog, module, {type: param, name: module_name, optional: true}]
-        params:
-          view: moduleView
+      - path: appcatalog/module/:-module_name
+        view: moduleView
 
-      - path:
-          [
-            appcatalog,
-            app,
-            {type: param, name: namespace},
-            {type: param, name: id},
-            {type: param, name: tag, optional: true},
-          ]
-        params:
-          view: appView
+      - path: appcatalog/app/:namespace/:id/:-tag
+        view: appView
 
       # Different from the 'catalog' version because the registration id is optional
-      - path:
-          [
-            appcatalog,
-            register,
-            {type: param, name: registration_id, optional: true},
-          ]
-        params:
-          view: catalogRegistration
+      - path: appcatalog/register/:-registration_id
+        view: catalogRegistration
 
-      - path:
-          [
-            appcatalog,
-            status,
-            {type: param, name: module_names, optional: true},
-          ]
-        params:
-          view: catalogStatus
+      - path: appcatalog/status/:-module_names
+        view: catalogStatus
 
-      - path: [appcatalog, service]
-        params:
-          view: serviceCatalog
+      - path: appcatalog/service
+        view: serviceCatalog
 
-      - path: [appcatalog, admin]
-        params:
-          view: catalogAdmin
+      - path: appcatalog/admin
+        view: catalogAdmin
 
-      - path: [appcatalog, stats]
-        params:
-          view: catalogStats
-
+      - path: appcatalog/stats
+        view: catalogStats
   menu:
     - name: catalog
       definition:

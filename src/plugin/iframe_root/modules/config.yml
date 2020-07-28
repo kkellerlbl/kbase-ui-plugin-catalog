@@ -164,6 +164,7 @@ views:
     type: factory
   - module: ../catalog_app_browser
     view: appsBrowser
+    reentrant: false
     type: factory
   - module: ../catalog_app_viewer
     view: appView

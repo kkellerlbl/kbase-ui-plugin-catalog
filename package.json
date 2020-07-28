@@ -6,7 +6,8 @@
     "scripts": {
         "build": "bash scripts/build-plugin.bash",
         "build-dev": "bash scripts/build-plugin-dev.bash",
-        "install-dev": "bash scripts/install-plugin-dev.bash"
+        "install-dev": "bash scripts/install-plugin-dev.bash",
+        "watch": "nodemon --watch ./src --ext js,css,yml,json --exec 'yarn install-dev'"
     },
     "repository": {
         "type": "git",
@@ -20,6 +21,7 @@
     "homepage": "https://github.com/kbase/kbase-ui-plugin-catalog#readme",
     "dependencies": {
         "eslint": "7.2.0",
-        "standard": "14.3.4"
+        "standard": "14.3.4",
+        "nodemon": "2.0.4"
     }
 }

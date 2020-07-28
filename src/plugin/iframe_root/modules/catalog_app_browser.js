@@ -13,7 +13,10 @@ define(['bluebird', 'kb_common/dom', 'kb_common/html', 'kbaseUI/widget/widgetSet
         var mount,
             container,
             runtime = config.runtime,
-            widgetSet = new WidgetSet({ runtime: runtime, widgetManager: runtime.service('widget').widgetManager }),
+            widgetSet = new WidgetSet({ 
+                runtime, 
+                widgetManager: runtime.service('widget').widgetManager 
+            }),
             layout;
 
         // Mini widget manager
@@ -51,15 +54,18 @@ define(['bluebird', 'kb_common/dom', 'kb_common/html', 'kbaseUI/widget/widgetSet
                 return widgetSet.start(params);
             });
         }
-        function run(params) {
-            return widgetSet.run(params);
-        }
+        // function run(params) {
+        //     return widgetSet.run(params);
+        // }
         function stop() {
             return widgetSet.stop();
         }
         function detach() {
             runtime.send('ui', 'setTitle', '');
-            return widgetSet.detach();
+            return widgetSet.detach()
+                .then(() => {
+                    container.innerHTML = '';
+                });
         }
         function destroy() {
             return widgetSet.destroy();
@@ -67,13 +73,13 @@ define(['bluebird', 'kb_common/dom', 'kb_common/html', 'kbaseUI/widget/widgetSet
 
         // Widget Interface
         return {
-            init: init,
-            attach: attach,
-            start: start,
-            run: run,
-            stop: stop,
-            detach: detach,
-            destroy: destroy
+            init,
+            attach,
+            start,
+            // run,
+            stop,
+            detach,
+            destroy
         };
     }
 

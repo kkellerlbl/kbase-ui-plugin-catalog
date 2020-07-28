@@ -33,8 +33,6 @@ define(['jquery', 'bluebird', 'kb_lib/html'], ($, Promise, html) => {
             this.title = title;
             this.runtime = runtime;
 
-            // console.log('kb widget?', param);
-
             this.mount = null;
             this.container = null;
             this.$container = null;

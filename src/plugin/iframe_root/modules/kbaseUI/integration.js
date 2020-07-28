@@ -3,12 +3,6 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
 
     class Integration {
         constructor({ rootWindow, pluginConfig }) {
-            if (!rootWindow) {
-                throw new Error('Constructor argument property "rootWindow" is required');
-            }
-            if (!pluginConfig) {
-                throw new Error('Constructor argument property "pluginConfig" is required');
-            }
             this.rootWindow = rootWindow;
             this.container = rootWindow.document.body;
             // channelId, frameId, hostId, parentHost
@@ -49,52 +43,34 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             if (this.navigationListeners.length === 1) {
                 const queue = this.navigationQueue;
                 this.navigationQueue = [];
-                queue.forEach(({ path, params }) => {
+                queue.forEach(({ view, params }) => {
                     this.navigationListeners.forEach((listener) => {
-                        listener({ path, params });
+                        listener({ view, params });
                     });
                 });
             }
         }
 
-        handleNavigation({ path, params }) {
+        handleNavigation({ view, params }) {
             // If no listeners yet, queue up the navigation.
             if (this.navigationListeners.length === 0) {
-                this.navigationQueue.push({ path, params });
+                this.navigationQueue.push({ view, params });
             } else {
                 this.navigationListeners.forEach((listener) => {
-                    listener({ path, params });
+                    listener({ view, params });
                 });
             }
         }
-
-        // handleView({view, params}) {
-
-        // }
-
         setupDOMListeners() {
             window.document.addEventListener('click', () => {
                 this.channel.send('clicked', {});
             });
         }
-
         setupListeners() {
             this.channel.on('navigate', (message) => {
-                const { path, params } = message;
-
-                // TODO: proper routing to error page
-                if ((!path || path.length === 0) && !params.view) {
-                    alert('no view provided...');
-                    return;
-                }
-
-                this.handleNavigation({ path, params });
+                const { view, params } = message;
+                this.handleNavigation({ view, params });
             });
-
-            // this.channel.on('view', (message) => {
-            //     const {view, params} = message;
-            //     this.handleView( {view, params });
-            // })
         }
 
         setupRuntimeListeners() {
@@ -129,14 +105,6 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                     this.channel.send('set-title', { title });
                 }
             });
-            // TODO: should be a way to simply forward messages to the ui...
-            this.runtime.messenger.receive({
-                channel: 'profile',
-                message: 'reload',
-                handler: () => {
-                    this.channel.send('reload-profile', {});
-                }
-            });
         }
 
         started() {
@@ -152,15 +120,24 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                 // ready message, is itself ready, and is ready for
                 // the iframe app to start running.
                 this.channel.on('start', (payload) => {
-                    const { authorization, config} = payload;
-                    this.authorization = authorization || null;
-                    const {token, username} = authorization;
+                    const {
+                        authorization,
+                        config
+                    } = payload;
+                    const { token, username, realname } = authorization;
+                    if (token) {
+                        this.authorization = { token, username, realname };
+                    } else {
+                        this.authorization = null;
+                    }
+
                     this.token = token;
                     this.username = username;
                     this.config = config;
                     this.authorized = token ? true : false;
 
                     this.runtime = new Runtime({
+                        authorization,
                         config,
                         token,
                         username,
@@ -172,15 +149,24 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
                         .then(() => {
                             this.setupListeners();
                             this.setupRuntimeListeners();
-                            this.setupDOMListeners();
                             resolve();
                         })
                         .catch((err) => {
                             reject(err);
                         });
+
+                    this.channel.on('loggedin', ({ token, username, realname, email }) => {
+                        this.runtime.send('session', 'loggedin');
+                    });
+
+                    this.channel.on('loggedout', () => {
+                        this.runtime.send('session', 'loggedout');
+                    });
                 });
 
-               
+                window.document.addEventListener('click', () => {
+                    this.channel.send('clicked', {});
+                });
 
                 // Sending 'ready' with our channel id and host name allows the
                 // enclosing app (window) to send us messages on our very own channel.
@@ -194,7 +180,7 @@ define(['./windowChannel', './runtime'], (WindowChannel, Runtime) => {
             });
         }
 
-        stop() { }
+        stop() {}
     }
 
     return Integration;

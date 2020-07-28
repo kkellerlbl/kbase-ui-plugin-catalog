@@ -65,21 +65,6 @@ require([
             pluginConfig
         });
 
-        // Add custom event hooks into the integration.
-        // integration.channel.on('run', (message) => {
-        //     console.log('RUN', message);
-        // });
-
-        // try {
-        //     integration.start();
-        // } catch (ex) {
-        //     console.error('Error starting main: ', ex.message);
-        // }
-
-        // const {
-        //     params: { config, token, username, routeParams }
-        // } = integration.getParamsFromIFrame();
-
         const rootNode = document.getElementById('root');
 
         // NOW -- we need to implement widget dispatch here
@@ -112,18 +97,13 @@ require([
                 return dispatcher.start();
             })
             .then((dispatcher) => {
-                integration.onNavigate(({ view, path, params }) => {
+                integration.onNavigate(({ view, params }) => {
                     // TODO: ever
-                    if (!view && params.view) {
-                        view = params.view;
-                    } else {
-                        view = path[0];
-                    }
                     if (!view) {
                         console.error('"view" missing', view, path, params);
                         throw new Error('A "view" is required for navigation');
                     }
-                    dispatcher.dispatch({ view, path, params });
+                    dispatcher.dispatch({ view, params });
                 });
                 integration.started();
                 // TODO: more channel listeners.
