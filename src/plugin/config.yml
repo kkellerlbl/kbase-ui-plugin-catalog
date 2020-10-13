@@ -5,8 +5,7 @@ package:
   description: The catalog panel and associated widgets
 services:
   route:
-    defaults:
-      forceMount: false
+    forceMount: false
     routes:
       # Catalog Index
       # The catalog index is the view which lists additional catalog tools.
@@ -109,8 +108,8 @@ services:
       - path: appcatalog/stats
         view: catalogStats
   menu:
-    - name: catalog
-      definition:
-        path: [catalog, apps]
+    items:
+      - name: catalog
+        path: catalog/apps
         label: Catalog
         icon: book
