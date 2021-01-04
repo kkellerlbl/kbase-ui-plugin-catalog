@@ -125,7 +125,7 @@ define(['jquery', 'kb_service/client/catalog', 'kb_widget/legacy/authenticatedWi
         },
 
         makeLink: function (url, name) {
-            return $('<a href="' + url + '">').append(name);
+            return $('<a href="' + url + '" target="_blank">').append(name);
         },
 
         makeUILink: function (url, name) {

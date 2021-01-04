@@ -247,7 +247,7 @@ define([
                 $('<a href="/#catalog" target="_parent">').append('<i class="fa fa-bars"></i> Index')
             );
             var $helpLink = $('<li>').append(
-                $('<a href="https://docs.kbase.us/apps/catalog">').append('<i class="fa fa-question-circle"></i> Help')
+                $('<a href="https://docs.kbase.us/apps/catalog" target="_blank">').append('<i class="fa fa-question-circle"></i> Help')
             );
 
             // PLACE CONTENT ON CONTROL BAR

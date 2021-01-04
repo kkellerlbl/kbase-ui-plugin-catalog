@@ -951,7 +951,7 @@ define([
                 var re = /For questions.{0,50}<a href="mailto:help@kbase.us".{1,50}help@kbase.us.{0,5}<\/a>/g;
                 var d_text = m.description.replace(
                     re,
-                    'Questions? Suggestions? Bug reports? Please <a href="https://www.kbase.us/support/">contact us</a> and include the app name and error message (if any).'
+                    'Questions? Suggestions? Bug reports? Please <a href="https://www.kbase.us/support/" target="_blank">contact us</a> and include the app name and error message (if any).'
                 );
 
                 self.$descriptionPanel
