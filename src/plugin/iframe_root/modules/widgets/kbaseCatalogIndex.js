@@ -53,7 +53,7 @@ define(['jquery', 'kb_service/client/catalog', 'kb_widget/legacy/authenticatedWi
             $m.append('<hr>');
 
             descriptionText = 'A brief introduction to KBase apps and the App Catalog.';
-            $m.append($('<h4>').append(self.makeLink('https://kbase.us/apps', 'App Catalog Help Pages'))).append(
+            $m.append($('<h4>').append(self.makeLink('https://docs.kbase.us/apps/catalog', 'App Catalog Help Pages'))).append(
                 $('<div>').append(descriptionText)
             );
             $m.append('<hr>');
