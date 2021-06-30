@@ -247,7 +247,7 @@ define([
                 $('<a href="/#catalog" target="_parent">').append('<i class="fa fa-bars"></i> Index')
             );
             var $helpLink = $('<li>').append(
-                $('<a href="https://docs.kbase.us/apps/catalog" target="_blank">').append('<i class="fa fa-question-circle"></i> Help')
+                $('<a href="https://docs.kbase.us/apps" target="_blank">').append('<i class="fa fa-question-circle"></i> Help')
             );
 
             // PLACE CONTENT ON CONTROL BAR
@@ -294,8 +294,8 @@ define([
                         var match = false; // every term must match
                         for (var t = 0; t < terms.length; t++) {
                             if (
-                                terms[t].charAt(0) == '"' &&
-                                terms[t].charAt(terms.length - 1) == '"' &&
+                                terms[t].charAt(0) === '"' &&
+                                terms[t].charAt(terms.length - 1) === '"' &&
                                 terms[t].length > 2
                             ) {
                                 terms[t] = terms[t].substring(1, terms[t].length - 1);
@@ -561,13 +561,13 @@ define([
 
             if (self.tag) {
                 var text_css = { color: '#777', 'font-size': '1.1em', margin: '5px' };
-                if (self.tag == 'dev') {
+                if (self.tag === 'dev') {
                     self.$functionListPanel.append(
                         $('<div>')
                             .css(text_css)
                             .append('Currently viewing Functions under development.')
                     );
-                } else if (self.tag == 'beta') {
+                } else if (self.tag === 'beta') {
                     self.$functionListPanel.append(
                         $('<div>')
                             .css(text_css)
@@ -587,7 +587,7 @@ define([
                 return;
             }
 
-            if (organizeBy == 'name_az') {
+            if (organizeBy === 'name_az') {
                 // sort by method name, A to Z
                 self.functionList.sort(function (a, b) {
                     if (a.info.name.toLowerCase() < b.info.name.toLowerCase()) return -1;
@@ -600,7 +600,7 @@ define([
                     $listContainer.append(self.functionList[k].getNewCardDiv());
                 }
                 self.$functionListPanel.append($listContainer);
-            } else if (organizeBy == 'name_za') {
+            } else if (organizeBy === 'name_za') {
                 // sort by method name, Z to A
                 self.functionList.sort(function (a, b) {
                     if (a.info.name.toLowerCase() < b.info.name.toLowerCase()) return 1;
@@ -613,7 +613,7 @@ define([
                     $listContainer.append(self.functionList[k].getNewCardDiv());
                 }
                 self.$functionListPanel.append($listContainer);
-            } else if (organizeBy == 'module') {
+            } else if (organizeBy === 'module') {
                 // Organization by module is simple because things can only be in one module, we sort and group them by module
 
                 self.functionList.sort(function (a, b) {
@@ -637,7 +637,7 @@ define([
 
                     var m = info.module_name;
 
-                    if (currentModuleName != m) {
+                    if (currentModuleName !== m) {
                         currentModuleName = m;
                         var $section = $('<div>').addClass('catalog-section');
                         $currentModuleDiv = $('<div>').addClass('kbcb-app-card-list-container');
@@ -655,7 +655,7 @@ define([
                     }
                     $currentModuleDiv.append(self.functionList[k].getNewCardDiv());
                 }
-            } else if (organizeBy == 'developer') {
+            } else if (organizeBy === 'developer') {
                 // get and sort the dev list
                 var devs = [];
                 for (k in self.developers) {
@@ -704,7 +704,7 @@ define([
                         $noAuthorDiv.append(self.functionList[k].getNewCardDiv());
                     }
                 }
-            } else if (organizeBy == 'category') {
+            } else if (organizeBy === 'category') {
                 var cats = [];
                 for (k in self.categories) {
                     cats.push(k);
@@ -753,7 +753,7 @@ define([
                         $noCatDiv.append(self.functionList[k].getNewCardDiv());
                     }
                 }
-            } else if (organizeBy == 'input_types') {
+            } else if (organizeBy === 'input_types') {
                 /*else if (organizeBy=='runs') {
 
                 self.$functionListPanel.append('<div><i>Note: Run counts for legacy methods released before 2016 are not reported.</i><br><br></div>');
@@ -820,7 +820,7 @@ define([
                         }
                     }
                 }
-            } else if (organizeBy == 'output_types') {
+            } else if (organizeBy === 'output_types') {
                 // get and sort the type list
                 const types = [];
                 for (const k in self.outputTypes) {
